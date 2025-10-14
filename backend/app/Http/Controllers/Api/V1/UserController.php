@@ -6,19 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
+use App\Http\Resources\V1\UserResource;
 class UserController extends Controller
 {
     // GET /api/v1/users
     public function index()
     {
-        return response()->json(User::all());
+        $users = User::with('taskLists')->paginate(3);
+        return UserResource::collection($users);
     }
 
     // POST /api/v1/users
     public function store(Request $request)
     {
-        $validated = $request->validate([
+       $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'phone' => 'nullable|string|max:20',
@@ -29,18 +30,15 @@ class UserController extends Controller
         $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
 
-        return response()->json([
-            'message' => 'User created successfully',
-            'user' => $user
-        ], 201);
+        return new UserResource($user);
     }
 
     // GET /api/v1/users/{id}
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::with('taskLists')->find($id);
         if (!$user) return response()->json(['error' => 'User not found'], 404);
-        return response()->json($user);
+        return new UserResource($user);
     }
 
     // PUT /api/v1/users/{id}
@@ -63,10 +61,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return response()->json([
-            'message' => 'User updated successfully',
-            'user' => $user
-        ]);
+        return new UserResource($user);
     }
 
     // DELETE /api/v1/users/{id}
@@ -74,6 +69,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         if (!$user) return response()->json(['error' => 'User not found'], 404);
+
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);
     }

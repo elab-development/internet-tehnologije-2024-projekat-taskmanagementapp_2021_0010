@@ -5,15 +5,17 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\TaskList;
 use Illuminate\Http\Request;
-
+use App\Http\Resources\V1\TaskListResource;
 class TaskListController extends Controller
 {
     public function index()
     {
-        return response()->json(TaskList::with('tasks')->get());
+        $taskLists = TaskList::with(['user', 'tasks'])->paginate(3);
+
+        return TaskListResource::collection($taskLists);
     }
 
-    public function store(Request $request)
+ public function store(Request $request)
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -23,15 +25,14 @@ class TaskListController extends Controller
         ]);
 
         $list = TaskList::create($validated);
-
-        return response()->json(['message' => 'Task list created', 'list' => $list], 201);
+        return new TaskListResource($list);
     }
 
     public function show($id)
     {
-        $list = TaskList::with('tasks')->find($id);
+        $list = TaskList::with(['user', 'tasks'])->find($id);
         if (!$list) return response()->json(['error' => 'Task list not found'], 404);
-        return response()->json($list);
+        return new TaskListResource($list);
     }
 
     public function update(Request $request, $id)
@@ -46,13 +47,14 @@ class TaskListController extends Controller
         ]);
 
         $list->update($validated);
-        return response()->json(['message' => 'Task list updated', 'list' => $list]);
+        return new TaskListResource($list);
     }
 
     public function destroy($id)
     {
         $list = TaskList::find($id);
         if (!$list) return response()->json(['error' => 'Task list not found'], 404);
+
         $list->delete();
         return response()->json(['message' => 'Task list deleted']);
     }

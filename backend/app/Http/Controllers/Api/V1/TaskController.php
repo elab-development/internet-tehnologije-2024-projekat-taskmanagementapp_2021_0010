@@ -5,17 +5,18 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
-
+use App\Http\Resources\V1\TaskResource;
 class TaskController extends Controller
 {
     public function index()
     {
-        return response()->json(Task::with(['category', 'taskList'])->get());
+        $tasks = Task::with(['category', 'taskList'])->paginate(3);
+        return TaskResource::collection($tasks);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+         $validated = $request->validate([
             'task_list_id' => 'required|exists:task_lists,id',
             'category_id' => 'nullable|exists:task_categories,id',
             'title' => 'required|string|max:255',
@@ -27,14 +28,16 @@ class TaskController extends Controller
         ]);
 
         $task = Task::create($validated);
-        return response()->json(['message' => 'Task created', 'task' => $task], 201);
+        return new TaskResource($task);
     }
 
     public function show($id)
     {
-        $task = Task::with(['category', 'taskList'])->find($id);
-        if (!$task) return response()->json(['error' => 'Task not found'], 404);
-        return response()->json($task);
+         $task = Task::with(['category', 'taskList'])->find($id);
+        if (!$task) {
+            return response()->json(['error' => 'Task not found'], 404);
+        }
+        return new TaskResource($task);
     }
 
     public function update(Request $request, $id)
@@ -52,7 +55,7 @@ class TaskController extends Controller
         ]);
 
         $task->update($validated);
-        return response()->json(['message' => 'Task updated', 'task' => $task]);
+        return new TaskResource($task);
     }
 
     public function destroy($id)
@@ -72,14 +75,34 @@ class TaskController extends Controller
 
     public function filterByPriority($priority)
     {
-        $tasks = Task::where('priority', $priority)->get();
-        return response()->json($tasks);
+        $tasks = Task::where('priority', $priority)->paginate(5);
+        return TaskResource::collection($tasks);
     }
 
     public function search(Request $request)
-    {
-        $query = $request->input('q');
-        $tasks = Task::where('title', 'LIKE', "%$query%")->get();
-        return response()->json($tasks);
+{
+   $query = $request->query('query');
+
+    if (!$query) {
+        return TaskResource::collection(Task::paginate(5));
     }
+
+    // Pretvori sve u mala slova za poređenje
+    $queryLower = strtolower($query);
+
+    $tasks = Task::whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
+        ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"])
+        ->paginate(5);
+
+    if ($tasks->isEmpty()) {
+        return response()->json([
+            'message' => 'Nema zadataka koji odgovaraju pretrazi.',
+            'query' => $query,
+            'data' => []
+        ]);
+    }
+
+    return TaskResource::collection($tasks);
+
+}
 }
