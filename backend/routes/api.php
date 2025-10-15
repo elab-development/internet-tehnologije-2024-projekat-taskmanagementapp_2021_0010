@@ -6,8 +6,13 @@ use App\Http\Controllers\Api\v1\UserController;
 use App\Http\Controllers\Api\v1\TaskListController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskCategoryController;
+use App\Http\Controllers\Api\v1\AuthController;
 
 Route::prefix('v1')->group(function () {
+ // AUTH rute
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+
   // 3 različite API rute (van resource)
     Route::get('tasks/status/{status}', [TaskController::class, 'filterByStatus']);
     Route::get('tasks/priority/{priority}', [TaskController::class, 'filterByPriority']);
@@ -32,8 +37,23 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('task-categories', TaskCategoryController::class);
    
 
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/user-test', function(Request $request) {
+        return response()->json($request->user());
+    });
+});
 
-    
+  // Zaštićene rute (samo za ulogovane)
+    Route::middleware('auth:sanctum')->group(function () {
+      Route::post('logout', [AuthController::class, 'logout']);
+
+      // Zaštićene rute - CREATE, UPDATE, DELETE
+      Route::apiResource('tasks', TaskController::class)->except(['index', 'show']);
+      Route::apiResource('users', UserController::class)->except(['index', 'show']);
+      Route::apiResource('task-lists', TaskListController::class)->except(['index', 'show']);
+      Route::apiResource('task-categories', TaskCategoryController::class)->except(['index', 'show']);
+    });
+
 });
 
 
