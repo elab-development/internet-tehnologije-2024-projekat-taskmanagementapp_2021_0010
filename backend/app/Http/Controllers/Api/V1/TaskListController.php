@@ -58,4 +58,11 @@ class TaskListController extends Controller
         $list->delete();
         return response()->json(['message' => 'Task list deleted']);
     }
+
+    public function getByUser($id)
+{
+    $lists = TaskList::where('user_id', $id)->with('tasks')->paginate(3);
+    return TaskListResource::collection($lists);
+}
+
 }

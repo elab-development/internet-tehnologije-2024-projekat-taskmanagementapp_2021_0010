@@ -79,6 +79,28 @@ class TaskController extends Controller
         return TaskResource::collection($tasks);
     }
 
+    public function filterByCategory($id)
+{
+    $tasks = Task::where('category_id', $id)->paginate(5);
+    return TaskResource::collection($tasks);
+}
+
+public function getByTaskList($id)
+{
+    $tasks = Task::where('task_list_id', $id)->with(['category'])->paginate(5);
+    return TaskResource::collection($tasks);
+}
+
+public function dueSoon()
+{
+    $today = now();
+    $tasks = Task::where('deadline', '>=', $today)
+                 ->where('deadline', '<=', $today->copy()->addDays(7))
+                 ->paginate(5);
+    return TaskResource::collection($tasks);
+}
+
+
     public function search(Request $request)
 {
    $query = $request->query('query');
