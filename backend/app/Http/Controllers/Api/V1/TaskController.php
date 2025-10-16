@@ -101,30 +101,38 @@ public function dueSoon()
 }
 
 
-    public function search(Request $request)
+ public function search(Request $request)
 {
-   $query = $request->query('query');
+    $query = Task::query();
 
-    if (!$query) {
-        return TaskResource::collection(Task::paginate(5));
+    if ($search = $request->query('query')) {
+        $queryLower = strtolower($search);
+        $query->whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"]);
     }
 
-    // Pretvori sve u mala slova za poređenje
-    $queryLower = strtolower($query);
+    if ($status = $request->query('status')) {
+        $query->where('status', $status);
+    }
 
-    $tasks = Task::whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
-        ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"])
-        ->paginate(5);
+    if ($priority = $request->query('priority')) {
+        $query->where('priority', $priority);
+    }
+
+    $sortBy = $request->query('sort_by', 'created_at'); // default
+    $direction = $request->query('direction', 'desc'); // asc ili desc
+
+    $tasks = $query->orderBy($sortBy, $direction)->paginate(5);
 
     if ($tasks->isEmpty()) {
         return response()->json([
             'message' => 'Nema zadataka koji odgovaraju pretrazi.',
-            'query' => $query,
+            'query' => $search,
             'data' => []
         ]);
     }
 
     return TaskResource::collection($tasks);
-
 }
+
 }
