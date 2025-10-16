@@ -30,6 +30,8 @@ public function taskLists()
         'name',
         'email',
         'password',
+        'phone',
+        'role',
     ];
 
     /**

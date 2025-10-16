@@ -37,12 +37,6 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('task-categories', TaskCategoryController::class);
    
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/user-test', function(Request $request) {
-        return response()->json($request->user());
-    });
-});
-
   // Zaštićene rute (samo za ulogovane)
     Route::middleware('auth:sanctum')->group(function () {
       Route::post('logout', [AuthController::class, 'logout']);
