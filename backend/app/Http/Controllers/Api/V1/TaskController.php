@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Http\Resources\V1\TaskResource;
+use Illuminate\Support\Facades\Response;
 class TaskController extends Controller
 {
     public function index()
@@ -133,6 +134,26 @@ public function dueSoon()
     }
 
     return TaskResource::collection($tasks);
+}
+
+
+public function export()
+{
+    $tasks = Task::with(['category', 'taskList'])->get();
+
+    $csv = "ID,Title,Status,Priority,Deadline,Category,TaskList\n";
+
+    foreach ($tasks as $task) {
+        $category = $task->category ? $task->category->name : 'N/A';
+        $taskList = $task->taskList ? $task->taskList->name : 'N/A';
+
+        $csv .= "{$task->id},\"{$task->title}\",{$task->status},{$task->priority},{$task->deadline},{$category},{$taskList}\n";
+    }
+
+    return Response::make($csv, 200, [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename=\"tasks_export.csv\"',
+    ]);
 }
 
 }
