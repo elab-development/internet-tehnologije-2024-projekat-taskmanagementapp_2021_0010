@@ -1,24 +1,24 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
-  const location = useLocation();
+  const [open, setOpen] = useState(false);
 
   return (
-    <aside className="sidebar">
-      <h2 className="sidebar-title">Task Manager</h2>
-      <nav>
-        <ul>
-          <li className={location.pathname === '/' ? 'active' : ''}>
-            <Link to="/">Dashboard</Link>
-          </li>
-          <li className={location.pathname === '/lists' ? 'active' : ''}>
-            <Link to="/lists">Lists</Link>
-          </li>
-          <li className={location.pathname === '/tasks' ? 'active' : ''}>
-            <Link to="/tasks">Tasks</Link>
-          </li>
-        </ul>
-      </nav>
-    </aside>
+    <>
+      <button className="menu-toggle" onClick={() => setOpen(!open)}>
+        {open ? <X size={22} color="#ff8fa3" /> : <Menu size={22} color="#ff8fa3" />}
+      </button>
+
+      <aside className={`sidebar ${open ? "open" : ""}`}>
+        <h2 className="sidebar-title">Task Manager</h2>
+        <nav className="sidebar-links">
+          <NavLink to="/" end>Dashboard</NavLink>
+          <NavLink to="/lists">Lists</NavLink>
+          <NavLink to="/tasks">Tasks</NavLink>
+        </nav>
+      </aside>
+    </>
   );
 }
