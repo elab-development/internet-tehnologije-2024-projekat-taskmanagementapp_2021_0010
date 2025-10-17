@@ -7,8 +7,13 @@ use App\Http\Controllers\Api\v1\TaskListController;
 use App\Http\Controllers\Api\v1\TaskController;
 use App\Http\Controllers\Api\v1\TaskCategoryController;
 use App\Http\Controllers\Api\v1\AuthController;
+use App\Http\Controllers\Api\v1\DashboardController;
 
 Route::prefix('v1')->group(function () {
+//ZA FRONT
+    Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
+    Route::get('/tasks-in-progress', [DashboardController::class, 'tasksInProgress']);
+
  // AUTH rute
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);

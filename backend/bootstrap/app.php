@@ -19,8 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             //\Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         //]);
         // Ovo dodaje Sanctum middleware da prepozna token
+    
         $middleware->api(prepend: [
-            EnsureFrontendRequestsAreStateful::class,
+           \Illuminate\Http\Middleware\HandleCors::class,
+        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+           // EnsureFrontendRequestsAreStateful::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
