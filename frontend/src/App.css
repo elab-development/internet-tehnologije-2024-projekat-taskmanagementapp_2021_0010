@@ -3,12 +3,11 @@ html, body, #root {
   padding: 0;
   height: 100%;
   width: 100%;
-  background-color: #000 !important; /* potpuno crna */
+  background-color: #000 !important; 
   color: #fff;
-  overflow-x: hidden; /* sprečava horizontalni scroll */
+  overflow-x: hidden; 
    height: 100%;
 }
-
 
 
 /* --- Glavni layout --- */
@@ -16,18 +15,17 @@ html, body, #root {
   min-height: 100vh;
   width: 100%;
   display: flex;
-  background-color: #000 !important; /* crna i za glavni kontejner */
+  background-color: #000 !important; 
 }
 
-
 .sidebar {
-  width: 230px;               /* ✅ fiksna širina — vrati na staru vrednost */
-  flex-shrink: 0;             /* ✅ sprečava da se sidebar smanjuje */
-  background-color: #181818;     /* crna pozadina */
+  width: 230px;              
+  flex-shrink: 0;             
+  background-color: #181818;     
   border-right: 1px solid #3f3e3e;  padding: 1.5rem;
   box-sizing: border-box;
-  height: 100vh;              /* ✅ sidebar uvek ide do dna */
-  position: sticky;           /* 🔥 ključna promena — lepi se na vrh dok se skroluje sadržaj */
+  height: 100vh;              
+  position: sticky;           
   top: 0;
   display: flex;
   flex-direction: column;
@@ -76,8 +74,8 @@ html, body, #root {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #ff8fa3; /* roze linija */
-  box-shadow: 0 0 15px rgba(255, 143, 163, 0.8); /* 💗 glow efekat */
+  background-color: #ff8fa3;
+  box-shadow: 0 0 15px rgba(255, 143, 163, 0.8); 
   border-radius: 4px;
 }
 
@@ -116,4 +114,171 @@ html, body, #root {
   background-color: #282727;
   border: 1px solid #ff8fa3;
 
+}
+
+
+/* --- Stat Card --- */
+.stats-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+.stat-card {
+  flex: 1;
+  border-radius: 12px;
+  padding: 1.4rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background-color: transparent; 
+  border: 1px solid #ff8fa3;     
+  color: #ff8fa3;                
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  background-color: rgba(255, 143, 163, 0.08);
+  box-shadow: 0 0 12px rgba(255, 143, 163, 0.2);
+}
+
+.stat-icon {
+  font-size: 0.9rem; 
+  color: inherit;    
+  flex-shrink: 0;
+}
+
+.stat-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.stat-info p {
+  margin: 0.3rem 0 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: currentColor !important; 
+}
+
+/* --- Tasks In Progress Section --- */
+.tasks-section {
+  margin-top: 2rem;
+  background: transparent;
+  border: 1px solid #ff8fa3;
+  border-radius: 16px;
+  padding: 1.5rem 1.8rem;
+  box-shadow: 0 0 18px rgba(255, 143, 163, 0.3); 
+  color: white;
+}
+
+.tasks-section-header h2 {
+  color: #ff8fa3;
+  font-size: 1.3rem;
+  margin: 0 0 0.4rem 0;
+}
+
+.tasks-section-header p {
+  color: #bbbbbb;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+/* lista unutar sekcije */
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* svaki pojedinačni task kao kartica */
+.task-item {
+  background: transparent;
+  border: 1px solid #ff8fa3;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(255, 143, 163, 0.2);
+}
+
+.task-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 14px rgba(255, 143, 163, 0.5);
+}
+
+/* naslov i meta info */
+.task-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ff8fa3;
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: #dddddd;
+}
+
+/* prioritet */
+.task-priority {
+  color: #ff8fa3;
+}
+
+.task-priority.high {
+  color: #ff1744;
+  font-weight: 600;
+}
+
+/* rok */
+.task-deadline {
+  color: #aaa;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  gap: 0.6rem;
+}
+
+.page-btn {
+  background: transparent;
+  border: 1px solid #ff8fa3;
+  color: #ff8fa3;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover {
+  background: rgba(255, 143, 163, 0.15);
+  box-shadow: 0 0 8px rgba(255, 143, 163, 0.4);
+}
+
+.page-btn.active {
+  background: #ff8fa3;
+  color: #000;
+  box-shadow: 0 0 10px rgba(255, 143, 163, 0.6);
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+  }
 }
