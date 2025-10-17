@@ -19,3 +19,101 @@ html, body, #root {
   background-color: #000 !important; /* crna i za glavni kontejner */
 }
 
+
+.sidebar {
+  width: 230px;               /* ✅ fiksna širina — vrati na staru vrednost */
+  flex-shrink: 0;             /* ✅ sprečava da se sidebar smanjuje */
+  background-color: #181818;     /* crna pozadina */
+  border-right: 1px solid #3f3e3e;  padding: 1.5rem;
+  box-sizing: border-box;
+  height: 100vh;              /* ✅ sidebar uvek ide do dna */
+  position: sticky;           /* 🔥 ključna promena — lepi se na vrh dok se skroluje sadržaj */
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.sidebar h2 {
+  color: #fff;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar a {
+  color: #bbb;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  color: #ff8fa3;
+}
+
+/* --- Dashboard --- */
+.main-content {
+  flex: 1;
+  padding: 2rem 3rem;
+  box-sizing: border-box;
+  background-color: #0e0e0e;
+}
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  position: relative;
+}
+
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #ff8fa3; /* roze linija */
+  box-shadow: 0 0 15px rgba(255, 143, 163, 0.8); /* 💗 glow efekat */
+  border-radius: 4px;
+}
+
+.dashboard h1 {
+  font-size: 2rem;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+.dashboard p {
+  color: #ccc;
+  font-size: 1rem;
+}
+
+.dashboard-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.pink-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: transparent;
+  color: #ff8fa3;
+  border: 1px solid #ff8fa3;
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pink-btn:hover {
+  background-color: #282727;
+  border: 1px solid #ff8fa3;
+
+}

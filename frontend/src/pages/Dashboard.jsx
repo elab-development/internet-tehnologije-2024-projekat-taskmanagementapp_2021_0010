@@ -26,6 +26,15 @@ export default function Dashboard() {
           <p>Welcome back! Here's your overview.</p>
         </div>
 </div>
+<div className="dashboard-buttons">
+          <button className="pink-btn" onClick={() => navigate('/lists')}>
+            <List size={16} /> View Lists
+          </button>
+          <button className="pink-btn" onClick={() => navigate('/tasks')}>
+            <ClipboardList size={16} /> View Tasks
+          </button>
+      </div>
+
 
     </div>
   );
