@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api from "../api/axios";
+import apiAuth from "../api/axiosAuth"; // ✅ ispravan import
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
@@ -21,11 +21,21 @@ export default function Register() {
     }
 
     try {
-      await api.get("http://127.0.0.1:8000/sanctum/csrf-cookie");
+  await apiAuth.get("/sanctum/csrf-cookie");
 
-      await api.post("/register", { name, email, password, password_confirmation });
-      navigate("/login");
+  // 2️⃣ registracija
+  const res = await apiAuth.post("/api/v1/register", {
+    name,
+    email,
+    password,
+    password_confirmation,
+  });
+
+  console.log(res.data);
+  alert("✅ Registration successful!");
+  navigate("/login");
     } catch (err) {
+      console.error(err.response?.data || err.message);
       setError("Registration failed. Try again.");
     }
   };
@@ -41,6 +51,7 @@ export default function Register() {
           <div className="input-group">
             <input
               type="text"
+              name="name"
               placeholder="Full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -50,6 +61,7 @@ export default function Register() {
           <div className="input-group">
             <input
               type="email"
+              name="email"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -59,6 +71,7 @@ export default function Register() {
           <div className="input-group">
             <input
               type="password"
+              name="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -68,6 +81,7 @@ export default function Register() {
           <div className="input-group">
             <input
               type="password"
+              name="password_confirmation"
               placeholder="Confirm password"
               value={password_confirmation}
               onChange={(e) => setPasswordConfirmation(e.target.value)}
@@ -78,9 +92,9 @@ export default function Register() {
           <button type="submit" className="pink-btn login-btn">
             Register
           </button>
-            <p className="auth-footer">
-           Already have an account? <a href="/login">Login</a>
-            </p>
+          <p className="auth-footer">
+            Already have an account? <a href="/login">Login</a>
+          </p>
 
           {error && <p className="error">{error}</p>}
         </form>

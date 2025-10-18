@@ -14,16 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
 )
 
     ->withMiddleware(function (Middleware $middleware): void {
-        // Sanctum middleware za API autentifikaciju
-        //$middleware->group('web', [
-            //\Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        //]);
-        // Ovo dodaje Sanctum middleware da prepozna token
     
         $middleware->api(prepend: [
            \Illuminate\Http\Middleware\HandleCors::class,
         \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-           // EnsureFrontendRequestsAreStateful::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api from "../api/axios";
+import apiAuth from "../api/axiosAuth"; // koristi istu instancu kao register
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
@@ -14,15 +14,20 @@ export default function Login() {
     setError("");
 
     try {
-      await api.get("http://127.0.0.1:8000/sanctum/csrf-cookie", {
-        withCredentials: true,
-      });
+      // 1️⃣ prvo uzmi CSRF cookie
+      await apiAuth.get("/sanctum/csrf-cookie");
 
-      await api.post("/login", { email, password });
+      // 2️⃣ pošalji login zahtev
+      const res = await apiAuth.post("/api/v1/login", { email, password });
 
-      // Ako uspe — preusmeri na Dashboard
+      // 3️⃣ možeš sačuvati token ako želiš u localStorage
+      localStorage.setItem("auth_token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // 4️⃣ redirekcija na dashboard
       navigate("/");
     } catch (err) {
+      console.error(err.response?.data || err.message);
       setError("Invalid credentials or server error.");
     }
   };
@@ -44,6 +49,7 @@ export default function Login() {
               required
             />
           </div>
+
           <div className="input-group">
             <input
               type="password"
@@ -57,9 +63,10 @@ export default function Login() {
           <button type="submit" className="pink-btn login-btn">
             Login
           </button>
+
           <p className="auth-footer">
-        Don’t have an account? <a href="/register">Register</a>
-       </p>
+            Don’t have an account? <a href="/register">Register</a>
+          </p>
 
           {error && <p className="error">{error}</p>}
         </form>
