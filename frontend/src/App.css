@@ -687,3 +687,105 @@ html, body, #root {
     box-sizing: border-box;
   }
 }
+
+/* === ItemCard styles === */
+.item-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #ffdce1;
+}
+
+.item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(255, 182, 193, 0.4);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-header h3 {
+  font-size: 1.1rem;
+  color: #222;
+  margin: 0;
+}
+
+.item-subtitle {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.item-description {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pink-btn {
+  background-color: #ff8fa3;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pink-btn:hover {
+  background-color: #ff6b8a;
+}
+
+/* === Page layout === */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* === Pagination === */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  border: 1px solid #ffb6c1;
+  background: white;
+  color: #ff4b6e;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pagination button.active {
+  background-color: #ff8fa3;
+  color: white;
+  border: none;
+}
+
+.pagination button:hover:not(.active) {
+  background-color: #ffe3e8;
+}

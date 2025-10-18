@@ -10,7 +10,7 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $tasks = Task::with(['category', 'taskList'])->paginate(3);
+        $tasks = Task::with(['category', 'taskList'])->paginate(5);
         return TaskResource::collection($tasks);
     }
 
