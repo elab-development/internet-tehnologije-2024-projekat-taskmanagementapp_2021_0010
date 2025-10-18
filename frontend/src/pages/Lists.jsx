@@ -1,4 +1,3 @@
-// src/pages/Lists.jsx
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import ItemCard from "../components/ItemCard";

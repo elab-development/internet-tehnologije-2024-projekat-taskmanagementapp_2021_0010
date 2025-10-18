@@ -691,14 +691,15 @@ html, body, #root {
 
 /* === ItemCard styles === */
 .item-card {
-  background: #fff;
+  background-color: transparent; 
+  border: 1px solid #ff8fa3;     
+  color: white; 
   border-radius: 16px;
   box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
   padding: 16px;
   margin-bottom: 16px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  border: 1px solid #ffdce1;
 }
 
 .item-card:hover {
@@ -714,18 +715,18 @@ html, body, #root {
 
 .item-header h3 {
   font-size: 1.1rem;
-  color: #222;
+  color: white;
   margin: 0;
 }
 
 .item-subtitle {
   font-size: 0.9rem;
-  color: #777;
+  color: #ff8fa3;
 }
 
 .item-description {
   font-size: 0.9rem;
-  color: #555;
+  color: #bbbbbb;
   margin-top: 6px;
   margin-bottom: 8px;
 }

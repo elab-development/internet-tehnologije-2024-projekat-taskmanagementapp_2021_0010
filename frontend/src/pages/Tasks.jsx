@@ -36,7 +36,16 @@ export default function Tasks() {
             <ItemCard
               key={task.id}
               title={task.title}
-              subtitle={`Priority: ${task.priority} | Status: ${task.status}`}
+              //subtitle={`Priority: ${task.priority} | Status: ${task.status}`}
+              subtitle={
+                <>
+                    Priority:{" "}
+                    <span className={`task-priority ${task.priority === 'hitno' ? 'high' : ''}`}>
+                    {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                    </span>{" "}
+                    | Status: {task.status}
+                </>
+                }
               description={`Deadline: ${task.deadline || "No deadline"}`}
             />
           ))
