@@ -287,6 +287,134 @@ html, body, #root {
   box-shadow: 0 0 10px rgba(255, 143, 163, 0.6);
 }
 
+/* === LOGIN & REGISTER PAGES === */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0e0e0e; /* crna pozadina */
+  padding: 2rem 1rem;
+}
+
+.login-box {
+  background: transparent;
+  border: 1px solid #ff8fa3;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(255, 143, 163, 0.3);
+  padding: 2rem 2.5rem;
+  text-align: center;
+  width: 350px;
+  margin-top: -2rem; /* podignuto malo ka vrhu */
+}
+
+.app-title {
+  color: #ff8fa3;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.welcome-text {
+  color: #ccc;
+  font-size: 0.95rem;
+  margin-bottom: 1.8rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-group input {
+  width: 90%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #ff8fa3;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+  box-shadow: 0 0 10px rgba(255, 143, 163, 0.4);
+}
+
+/* --- Dugme --- */
+.login-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  width: 30%;
+  align-self: center;
+  padding: 0.5rem;
+  border: 1px solid #ff8fa3;
+  border-radius: 8px;
+  background: transparent;
+  color: #ff8fa3;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.login-btn:hover {
+  background-color: rgba(255, 143, 163, 0.15);
+  box-shadow: 0 0 12px rgba(255, 143, 163, 0.6);
+  transform: scale(1.03);
+}
+
+
+/* --- Tekst ispod forme --- */
+.auth-footer {
+  margin-top: 1.3rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: #ff8fa3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.error {
+  color: #ff1744;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+.app-logo {
+  width: 12rem;
+  height: 12rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 20px rgba(255, 143, 163, 0.9));
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+   animation: pulseGlow 2.5s infinite ease-in-out;
+
+}
+
+
+
+
+
 
 /* --- Responsive Layout --- */
 
