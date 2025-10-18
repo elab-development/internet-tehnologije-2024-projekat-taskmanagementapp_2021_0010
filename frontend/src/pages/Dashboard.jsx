@@ -4,6 +4,7 @@ import StatCard from '../components/StatCard';
 import { List, CheckCircle, AlertTriangle, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+
 export default function Dashboard() {
   const [stats, setStats] = useState({
     totalTasks: 0,
@@ -38,6 +39,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
+
       <div className="dashboard-header">
         <div>
           <h1>Dashboard</h1>

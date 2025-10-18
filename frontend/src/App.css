@@ -425,6 +425,36 @@ html, body, #root {
     filter: drop-shadow(0 0 5px #ff8fa3) drop-shadow(0 0 10px #ff8fa3);
   }
 }
+/* --- Breadcrumbs Fix + Stil --- */
+.breadcrumbs {
+  position: relative;
+  background: transparent;
+  width: auto;
+  height: auto;
+  padding: 0 0 1rem 0;
+  z-index: 1;
+  font-size: 0.95rem;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-link {
+  color: #ff8fa3;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: #fff;
+}
+
+.breadcrumb-current {
+  color: #fff;
+  font-weight: 500;
+}
+
 
 
 

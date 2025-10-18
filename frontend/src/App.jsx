@@ -5,7 +5,9 @@ import Lists from "./pages/Lists";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Sidebar from "./components/Sidebar";
+import Breadcrumbs from "./components/Breadcrumbs";
 import "./App.css";
+
 
 function App() {
   return (
@@ -23,12 +25,16 @@ function AppContent() {
     location.pathname === "/" ||
     location.pathname === "/tasks" ||
     location.pathname === "/lists";
+   const hideUI = ["/login", "/register"].includes(location.pathname);
+
 
   return (
     <div className="app-container">
       {showSidebar && <Sidebar />}
 
       <main className="main-content">
+        {!hideUI && <Breadcrumbs />}
+
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/tasks" element={<Tasks />} />
