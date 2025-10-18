@@ -34,12 +34,12 @@ Route::prefix('v1')->group(function () {
 
 
   // Jedna RESOURCE ruta (za tasks)
-    Route::apiResource('tasks', TaskController::class);
+    Route::apiResource('tasks', TaskController::class)->only(['index', 'show']);;
 
     // Ostale RESOURCE rute (dodatno)
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('task-lists', TaskListController::class);
-    Route::apiResource('task-categories', TaskCategoryController::class);
+    Route::apiResource('users', UserController::class)->only(['index', 'show']);;
+    Route::apiResource('task-lists', TaskListController::class)->only(['index', 'show']);;
+    Route::apiResource('task-categories', TaskCategoryController::class)->only(['index', 'show']);;
    
 
   // Zaštićene rute (samo za ulogovane)
