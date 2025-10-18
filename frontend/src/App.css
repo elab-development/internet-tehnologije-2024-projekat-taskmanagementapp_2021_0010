@@ -411,8 +411,19 @@ html, body, #root {
 
 }
 
+/* === Neon pulse efekat za logo === */
 
-
+@keyframes pulseGlow {
+  0% {
+    filter: drop-shadow(0 0 5px #ff8fa3) drop-shadow(0 0 10px #ff8fa3);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px #ff4f7a) drop-shadow(0 0 25px #ff4f7a);
+  }
+  100% {
+    filter: drop-shadow(0 0 5px #ff8fa3) drop-shadow(0 0 10px #ff8fa3);
+  }
+}
 
 
 
