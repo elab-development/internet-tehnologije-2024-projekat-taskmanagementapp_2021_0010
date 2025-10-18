@@ -1,61 +1,114 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import ItemCard from "../components/ItemCard";
+import { Filter } from "lucide-react";
+import "../App.css";
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
+  const [status, setStatus] = useState("svi");
+  const [priority, setPriority] = useState("svi");
+ 
 
-  const fetchTasks = (page = 1) => {
-    api.get(`/tasks?page=${page}`)
-      .then((res) => {
-        setTasks(res.data.data);
-        setCurrentPage(res.data.meta.current_page);
-        setLastPage(res.data.meta.last_page);
-      })
-      .catch((err) => console.error(err));
-  };
+const fetchTasks = async () => {
+  try {
+    const res = await api.get("/tasks");
+    let data = res.data.data || res.data || [];
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (!Array.isArray(data)) data = [data];
+
+    // Filtriranje na frontu
+    let filtered = data;
+
+    if (status !== "svi") {
+      filtered = filtered.filter(
+        (task) => task.status && task.status.toLowerCase() === status.toLowerCase()
+      );
+    }
+
+    if (priority !== "svi") {
+      filtered = filtered.filter(
+        (task) =>
+          task.priority && task.priority.toLowerCase() === priority.toLowerCase()
+      );
+    }
+
+    setTasks(filtered);
+  } catch (err) {
+    console.error("❌ Greška pri učitavanju zadataka:", err);
+    setTasks([]);
+  }
+};
+
+useEffect(() => {
+  fetchTasks();
+}, [status, priority]);
+
+
+
+useEffect(() => {
+  fetchTasks();
+}, [status, priority]); // svaka promena filtera poziva API
+
 
   return (
     <div className="tasks-page">
-      <div className="page-header">
-        <h1 className="font-bold text-white mb-6" style={{ fontSize: '2rem' }}>All Tasks</h1>
-        <button className="pink-btn">+ Add Task</button>
+      <div className="tasks-header">
+        <h1>Tasks</h1>
+<div className="filters">
+  <div className="filter-group">
+    <Filter size={16} color="#ff8fa3" />
+
+    <select
+      className="filter-select"
+      value={status}
+      onChange={(e) => setStatus(e.target.value)}
+    >
+      <option value="svi">Svi statusi</option>
+      <option value="započet">Započet</option>
+      <option value="u toku">U toku</option>
+      <option value="završen">Završen</option>
+    </select>
+
+    <select
+      className="filter-select"
+      value={priority}
+      onChange={(e) => setPriority(e.target.value)}
+    >
+      <option value="svi">Svi prioriteti</option>
+      <option value="nizak">Nizak</option>
+      <option value="srednji">Srednji</option>
+      <option value="visok">Visok</option>
+      <option value="hitno">Hitno</option>
+    </select>
+  </div>
+</div>
+
+
+
       </div>
 
-      <div className="item-list">
+      <div className="tasks-list">
         {tasks.length === 0 ? (
-          <p>No tasks available.</p>
+          <p>Nema zadataka za prikaz.</p>
         ) : (
           tasks.map((task) => (
-            <ItemCard
-              key={task.id}
-              title={task.title}
-              subtitle={`Priority: ${task.priority} | Status: ${task.status}`}
-              description={`Deadline: ${task.deadline || "No deadline"}`}
-            />
+            <div key={task.id} className="task-item">
+              <div className="task-title">{task.title}</div>
+              <div className="task-meta">
+                <span
+                  className={`task-priority ${
+                    task.priority === "hitno" ? "high" : ""
+                  }`}
+                >
+                  {task.priority.charAt(0).toUpperCase() +
+                    task.priority.slice(1)}
+                </span>
+                <span className="task-status">{task.status}</span>
+                <span className="task-deadline">Rok: {task.deadline}</span>
+              </div>
+            </div>
           ))
         )}
-      </div>
-
-      {/* Pagination */}
-      <div className="pagination">
-        <button disabled={currentPage === 1} onClick={() => fetchTasks(currentPage - 1)}>←</button>
-        {[...Array(lastPage)].map((_, i) => (
-          <button
-            key={i}
-            className={currentPage === i + 1 ? "active" : ""}
-            onClick={() => fetchTasks(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <button disabled={currentPage === lastPage} onClick={() => fetchTasks(currentPage + 1)}>→</button>
       </div>
     </div>
   );

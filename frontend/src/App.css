@@ -455,6 +455,41 @@ html, body, #root {
   font-weight: 500;
 }
 
+/* --- Filters --- */
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.filter-select {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #ff8fa3;
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+  box-shadow: 0 0 8px rgba(255, 143, 163, 0.4);
+}
+
+.filter-select option {
+  color: #000; /* da se vidi tekst kad se otvori dropdown */
+}
+
+
 
 
 
