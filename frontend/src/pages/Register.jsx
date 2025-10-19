@@ -23,6 +23,7 @@ export default function Register() {
     try {
   await apiAuth.get("/sanctum/csrf-cookie");
 
+  await new Promise(r => setTimeout(r, 200));
   // 2️⃣ registracija
   const res = await apiAuth.post("/api/v1/register", {
     name,
