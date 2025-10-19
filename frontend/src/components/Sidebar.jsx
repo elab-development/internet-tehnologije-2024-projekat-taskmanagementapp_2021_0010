@@ -17,6 +17,8 @@ export default function Sidebar() {
           <NavLink to="/" end>Dashboard</NavLink>
           <NavLink to="/lists">Lists</NavLink>
           <NavLink to="/tasks">Tasks</NavLink>
+          <NavLink to="/logout">Logout</NavLink>
+
         </nav>
       </aside>
     </>

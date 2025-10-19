@@ -59,29 +59,53 @@ export default function Tasks() {
   }, [listId, status, priority]);
 
   // --- Kreiranje ili ažuriranje zadatka ---
-  const handleCreateOrUpdate = (data) => {
-    const req = editTask
-      ? api.put(`/tasks/${editTask.id}`, data)
-      : api.post(`/tasks`, { ...data, task_list_id: listId || 1 });
+ const handleCreateOrUpdate = (data) => {
+  // 🔐 Provera da li je korisnik prijavljen
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Morate biti prijavljeni da biste dodavali ili menjali zadatke!");
+    return;
+  }
 
-    req
-      .then(() => {
-        fetchTasks();
-        setShowModal(false);
-        setEditTask(null);
-      })
-      .catch((err) => console.error(err));
-  };
+  const req = editTask
+    ? api.put(`/tasks/${editTask.id}`, data)
+    : api.post(`/tasks`, { ...data, task_list_id: listId || 1 });
+
+  req
+    .then(() => {
+      fetchTasks();
+      setShowModal(false);
+      setEditTask(null);
+    })
+    .catch((err) => {
+      // ⚠️ Ako je token nevažeći ili istekla sesija
+      if (err.response?.status === 401) {
+        alert("Vaša sesija je istekla. Prijavite se ponovo!");
+        localStorage.removeItem("token");
+        window.location.href = "/login"; // preusmeri korisnika
+      } else {
+        console.error("❌ Greška pri čuvanju zadatka:", err);
+      }
+    });
+};
+
 
   // --- Brisanje zadatka ---
-  const handleDelete = (id) => {
-    if (!window.confirm("Da li ste sigurni da želite da obrišete zadatak?"))
-      return;
-    api
-      .delete(`/tasks/${id}`)
-      .then(() => fetchTasks())
-      .catch((err) => console.error(err));
-  };
+  const handleDelete = async (id) => {
+  if (!window.confirm("Da li ste sigurni da želite da obrišete zadatak?")) return;
+
+  try {
+    await api.delete(`/tasks/${id}`);
+    fetchTasks();
+  } catch (err) {
+    if (err.response?.status === 401) {
+      alert("Morate biti prijavljeni da biste obrisali zadatak!");
+    } else {
+      console.error("Greška pri brisanju:", err);
+    }
+  }
+};
+
 
   // --- Render ---
   return (

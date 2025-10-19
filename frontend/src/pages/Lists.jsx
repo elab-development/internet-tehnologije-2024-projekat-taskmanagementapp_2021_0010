@@ -26,24 +26,52 @@ export default function Lists() {
     fetchLists();
   }, []);
 
-  const handleCreateOrUpdate = (data) => {
-    const req = editList
-      ? api.put(`/task-lists/${editList.id}`, data)
-      : api.post(`/task-lists`, { ...data, user_id: 1 }); // user_id zameni sa trenutnim ako imaš auth
-    
-    req.then(() => {
+ const handleCreateOrUpdate = (data) => {
+  // Ako korisnik nije prijavljen (nema token)
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Morate biti prijavljeni da biste dodavali ili menjali liste!");
+    return; // prekini funkciju odmah
+  }
+
+  const req = editList
+    ? api.put(`/task-lists/${editList.id}`, data)
+    : api.post(`/task-lists`, { ...data, user_id: 1 }); // user_id zameni sa pravim ako imaš auth
+
+  req
+    .then(() => {
       fetchLists();
       setShowModal(false);
       setEditList(null);
-    }).catch(err => console.error(err));
-  };
+    })
+    .catch((err) => {
+      // ako backend ipak vrati 401 (npr. token istekao)
+      if (err.response?.status === 401) {
+        alert("Vaša sesija je istekla. Prijavite se ponovo!");
+        localStorage.removeItem("token");
+        window.location.href = "/login"; // redirekt na login
+      } else {
+        console.error("❌ Greška pri čuvanju liste:", err);
+      }
+    });
+};
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this list?")) return;
-    api.delete(`/task-lists/${id}`)
-      .then(() => fetchLists())
-      .catch(err => console.error(err));
-  };
+
+const handleDelete = async (id) => {
+  if (!window.confirm("Da li ste sigurni da želite da obrišete listu?")) return;
+
+  try {
+    await api.delete(`/task-lists/${id}`);
+    fetchTasks();
+  } catch (err) {
+    if (err.response?.status === 401) {
+      alert("Morate biti prijavljeni da biste obrisali listu!");
+    } else {
+      console.error("Greška pri brisanju:", err);
+    }
+  }
+};
+
 
   return (
     <div className="lists-page">
