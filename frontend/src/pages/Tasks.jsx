@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../api/axios";
+import api from "../api/axios";               // 🔓 javni GET (prikaz)
+import apiProtected from "../api/axiosProtected"; // 🔒 zaštićene POST/PUT/DELETE
 import { Filter } from "lucide-react";
 import ItemCard from "../components/ItemCard";
 import ModalForm from "../components/ModalForm";
@@ -18,7 +19,7 @@ export default function Tasks() {
 
   const listId = searchParams.get("list_id");
 
-  // --- Učitavanje zadataka sa filtriranjem i paginacijom ---
+  // 🔓 Javni GET (prikaz zadataka)
   const fetchTasks = (page = 1) => {
     const url = listId ? `/task-lists/${listId}` : `/tasks?page=${page}`;
     api
@@ -45,24 +46,23 @@ export default function Tasks() {
         }
 
         setTasks(filtered);
-
         if (!listId && res.data.meta) {
           setCurrentPage(res.data.meta.current_page);
           setLastPage(res.data.meta.last_page);
         }
       })
-      .catch((err) => console.error("❌ Greška pri učitavanju zadataka:", err));
+      .catch((err) => console.error("❌ Greška pri učitavanju:", err));
   };
 
   useEffect(() => {
     fetchTasks();
   }, [listId, status, priority]);
 
-  // --- Kreiranje ili ažuriranje zadatka ---
+  // 🔒 Kreiranje ili ažuriranje zadatka
   const handleCreateOrUpdate = (data) => {
     const req = editTask
-      ? api.put(`/tasks/${editTask.id}`, data)
-      : api.post(`/tasks`, { ...data, task_list_id: listId || 1 });
+      ? apiProtected.put(`/tasks/${editTask.id}`, data)
+      : apiProtected.post(`/tasks`, { ...data, task_list_id: listId || 1 });
 
     req
       .then(() => {
@@ -70,20 +70,20 @@ export default function Tasks() {
         setShowModal(false);
         setEditTask(null);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("❌ Greška pri čuvanju:", err));
   };
 
-  // --- Brisanje zadatka ---
+  // 🔒 Brisanje zadatka
   const handleDelete = (id) => {
     if (!window.confirm("Da li ste sigurni da želite da obrišete zadatak?"))
       return;
-    api
+
+    apiProtected
       .delete(`/tasks/${id}`)
       .then(() => fetchTasks())
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("❌ Greška pri brisanju:", err));
   };
 
-  // --- Render ---
   return (
     <div className="tasks-page">
       <div className="page-header">
@@ -91,11 +91,10 @@ export default function Tasks() {
           {listId ? "Zadaci u listi" : "Svi zadaci"}
         </h1>
 
-        {/* Filteri */}
+        {/* 🔍 Filteri */}
         <div className="filters">
           <div className="filter-group">
             <Filter size={16} color="#ff8fa3" />
-
             <select
               className="filter-select"
               value={status}
@@ -106,7 +105,6 @@ export default function Tasks() {
               <option value="u toku">U toku</option>
               <option value="završen">Završen</option>
             </select>
-
             <select
               className="filter-select"
               value={priority}
@@ -121,13 +119,12 @@ export default function Tasks() {
           </div>
         </div>
 
-        {/* Dugme za dodavanje zadatka */}
         <button className="pink-btn" onClick={() => setShowModal(true)}>
           + Dodaj zadatak
         </button>
       </div>
 
-      {/* Lista zadataka */}
+      {/* 🧾 Lista zadataka */}
       <div className="tasks-list">
         {tasks.length === 0 ? (
           <p>Nema zadataka za prikaz.</p>
@@ -141,7 +138,9 @@ export default function Tasks() {
                   Prioritet:{" "}
                   <span
                     className={`task-priority ${
-                      task.priority === "visok" ? "high" : ""
+                      task.priority === "visok" || task.priority === "hitno"
+                        ? "high"
+                        : ""
                     }`}
                   >
                     {task.priority
@@ -163,34 +162,7 @@ export default function Tasks() {
         )}
       </div>
 
-      {/* Paginacija */}
-      {!listId && (
-        <div className="pagination">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => fetchTasks(currentPage - 1)}
-          >
-            ←
-          </button>
-          {[...Array(lastPage)].map((_, i) => (
-            <button
-              key={i}
-              className={currentPage === i + 1 ? "active" : ""}
-              onClick={() => fetchTasks(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            disabled={currentPage === lastPage}
-            onClick={() => fetchTasks(currentPage + 1)}
-          >
-            →
-          </button>
-        </div>
-      )}
-
-      {/* Modal za kreiranje/izmenu zadatka */}
+      {/* 🪟 Modal za novi/izmenu zadatka */}
       {showModal && (
         <ModalForm
           title={editTask ? "Izmena zadatka" : "Novi zadatak"}

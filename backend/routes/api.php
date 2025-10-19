@@ -10,50 +10,46 @@ use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\DashboardController;
 
 Route::prefix('v1')->group(function () {
-//ZA FRONT
+
+    // 🧭 JAVNE RUTE (bez autentifikacije)
     Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
     Route::get('/tasks-in-progress', [DashboardController::class, 'tasksInProgress']);
 
- // AUTH rute
+    // AUTH (bez auth:sanctum)
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 
-  // 3 različite API rute (van resource)
+    // 🧭 JAVNE TASK RUTE — prikaz i filtriranje
+    Route::get('tasks', [TaskController::class, 'index']);
+    Route::get('tasks/{id}', [TaskController::class, 'show']);
+
     Route::get('tasks/status/{status}', [TaskController::class, 'filterByStatus']);
     Route::get('tasks/priority/{priority}', [TaskController::class, 'filterByPriority']);
     Route::get('tasks/search', [TaskController::class, 'search']);
-
- //dodate rute za filtriranje
     Route::get('tasks/category/{id}', [TaskController::class, 'filterByCategory']);
     Route::get('users/{id}/task-lists', [TaskListController::class, 'getByUser']);
     Route::get('task-lists/{id}/tasks', [TaskController::class, 'getByTaskList']);
-    // Zadaci kojima ističe rok za 7 dana
     Route::get('tasks/due-soon', [TaskController::class, 'dueSoon']);
-    
 
+    // 🧭 JAVNE RESOURCE RUTE (samo za prikaz)
+    Route::apiResource('users', UserController::class)->only(['index', 'show']);
+    Route::apiResource('task-lists', TaskListController::class)->only(['index', 'show']);
+    Route::apiResource('task-categories', TaskCategoryController::class)->only(['index', 'show']);
 
-
-  // Jedna RESOURCE ruta (za tasks)
-    Route::apiResource('tasks', TaskController::class)->only(['index', 'show']);;
-
-    // Ostale RESOURCE rute (dodatno)
-    Route::apiResource('users', UserController::class)->only(['index', 'show']);;
-    Route::apiResource('task-lists', TaskListController::class)->only(['index', 'show']);;
-    Route::apiResource('task-categories', TaskCategoryController::class)->only(['index', 'show']);;
-   
-
-  // Zaštićene rute (samo za ulogovane)
+    // 🔒 ZAŠTIĆENE RUTE (autentifikacija potrebna)
     Route::middleware('auth:sanctum')->group(function () {
-      Route::post('logout', [AuthController::class, 'logout']);
 
-      // Zaštićene rute - CREATE, UPDATE, DELETE
-      Route::apiResource('tasks', TaskController::class)->except(['index', 'show']);
-      Route::apiResource('users', UserController::class)->except(['index', 'show']);
-      Route::apiResource('task-lists', TaskListController::class)->except(['index', 'show']);
-      Route::apiResource('task-categories', TaskCategoryController::class)->except(['index', 'show']);
+        // Logout
+        Route::post('logout', [AuthController::class, 'logout']);
+
+        // CRUD operacije koje menjaju bazu
+        Route::post('tasks', [TaskController::class, 'store']);
+        Route::put('tasks/{id}', [TaskController::class, 'update']);
+        Route::delete('tasks/{id}', [TaskController::class, 'destroy']);
+
+        // Ostali resursi ako budu potrebni
+        Route::apiResource('users', UserController::class)->except(['index', 'show']);
+        Route::apiResource('task-lists', TaskListController::class)->except(['index', 'show']);
+        Route::apiResource('task-categories', TaskCategoryController::class)->except(['index', 'show']);
     });
-
 });
-
-
-
