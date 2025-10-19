@@ -1,5 +1,5 @@
 import { useState } from "react";
-import apiAuth from "../api/axiosAuth"; // koristi istu instancu kao register
+import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
@@ -14,14 +14,13 @@ export default function Login() {
     setError("");
 
     try {
-      // 1️⃣ prvo uzmi CSRF cookie
-      await apiAuth.get("/sanctum/csrf-cookie");
+
 
       // 2️⃣ pošalji login zahtev
-      const res = await apiAuth.post("/api/v1/login", { email, password });
+      const res = await axios.post("/login", { email, password });
 
       // 3️⃣ možeš sačuvati token ako želiš u localStorage
-      localStorage.setItem("auth_token", res.data.token);
+      localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // 4️⃣ redirekcija na dashboard

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import apiAuth from "../api/axiosAuth"; // ✅ ispravan import
+import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
@@ -21,11 +21,9 @@ export default function Register() {
     }
 
     try {
-  await apiAuth.get("/sanctum/csrf-cookie");
 
-  await new Promise(r => setTimeout(r, 200));
-  // 2️⃣ registracija
-  const res = await apiAuth.post("/api/v1/register", {
+
+  const res = await axios.post("/register", {
     name,
     email,
     password,
