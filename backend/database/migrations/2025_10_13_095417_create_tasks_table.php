@@ -20,6 +20,7 @@ return new class extends Migration
     $table->enum('priority', ['nizak', 'srednji', 'visok'])->default('srednji');
     $table->enum('status', ['započet', 'u toku', 'završen'])->default('započet');
     $table->date('deadline')->nullable();
+    $table->integer('estimated_hours')->nullable();
     $table->timestamps();
         });
     }

@@ -21,8 +21,8 @@ class TaskController extends Controller
             'category_id' => 'nullable|exists:task_categories,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'priority' => 'in:nizak,srednji,visok',
-            'status' => 'in:započet,u toku,završen',
+            'priority' => 'nullable|in:nizak,srednji,visok',
+            'status' => 'nullable|in:započet,u toku,završen',
             'deadline' => 'nullable|date',
             'estimated_hours' => 'nullable|integer|min:1'
         ]);
@@ -48,8 +48,8 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'priority' => 'in:nizak,srednji,visok',
-            'status' => 'in:započet,u toku,završen',
+            'priority' => 'nullable|in:nizak,srednji,visok',
+            'status' => 'nullable|in:započet,u toku,završen',
             'deadline' => 'nullable|date',
             'estimated_hours' => 'nullable|integer|min:1'
         ]);

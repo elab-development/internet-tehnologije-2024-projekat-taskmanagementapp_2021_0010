@@ -82,7 +82,7 @@ export default function Dashboard() {
                   <span className={`task-priority ${task.priority === 'hitno' ? 'high' : ''}`}>
                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                   </span>
-                  <span className="task-deadline">Rok: {task.deadline}</span>
+                  <span className="task-deadline">Deadline: {task.deadline}</span>
                 </div>
               </div>
             ))
