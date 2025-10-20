@@ -133,6 +133,13 @@ html, body, #root {
   border: 1px solid #ff8fa3;
 
 }
+.export-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
 
 
 /* --- Stat Card --- */

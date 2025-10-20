@@ -144,6 +144,32 @@ const req = editTask
 };
 
 
+const handleExport = async () => {
+  try {
+    const response = await api.get("/tasks/export", {
+      responseType: "blob", // 📦 važno! da bi preuzeo fajl kao binarni sadržaj
+    });
+
+    // Kreiraj URL za fajl u memoriji
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // Kreiraj <a> element i simuliraj klik za preuzimanje
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "tasks_export.csv");
+    document.body.appendChild(link);
+    link.click();
+
+    // Očisti
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("❌ Greška pri izvozu:", error);
+    alert("Došlo je do greške pri izvozu zadataka!");
+  }
+};
+
+
   // --- Render ---
   return (
     <div className="tasks-page">
@@ -180,6 +206,7 @@ const req = editTask
               <option value="hitno">Hitno</option>
             </select>
           </div>
+          
         </div>
 
         {/* Dugme za dodavanje zadatka */}
@@ -202,7 +229,7 @@ const req = editTask
                   Prioritet:{" "}
                   <span
                     className={`task-priority ${
-                      task.priority === "visok" ? "high" : ""
+                      task.priority === "hitno" ? "high" : ""
                     }`}
                   >
                     {task.priority
@@ -234,6 +261,14 @@ const req = editTask
           ))
         )}
       </div>
+{/* 📤 Dugme za izvoz CSV-a */}
+<div className="export-btn-container">
+  <button className="pink-btn" onClick={handleExport}>
+    📤 Izvezi CSV
+  </button>
+</div>
+
+
 
       {/* Paginacija */}
       {!listId && (
@@ -330,7 +365,16 @@ initialValue: editTask?.task_list_id || "",
             setEditTask(null);
           }}
         />
+  
+
       )}
+
+      
     </div>
+    
   );
+
+
+
+
 }
