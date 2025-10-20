@@ -23,6 +23,8 @@ Route::prefix('v1')->group(function () {
     Route::get('tasks/priority/{priority}', [TaskController::class, 'filterByPriority']);
     Route::get('tasks/search', [TaskController::class, 'search']);
 
+    Route::get('tasks/export', [TaskController::class, 'export']);
+
  //dodate rute za filtriranje
     Route::get('tasks/category/{id}', [TaskController::class, 'filterByCategory']);
     Route::get('users/{id}/task-lists', [TaskListController::class, 'getByUser']);

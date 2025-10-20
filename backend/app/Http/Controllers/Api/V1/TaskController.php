@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Http\Resources\V1\TaskResource;
+use Illuminate\Support\Facades\Response;
 class TaskController extends Controller
 {
     public function index()
@@ -101,30 +102,58 @@ public function dueSoon()
 }
 
 
-    public function search(Request $request)
+ public function search(Request $request)
 {
-   $query = $request->query('query');
+    $query = Task::query();
 
-    if (!$query) {
-        return TaskResource::collection(Task::paginate(5));
+    if ($search = $request->query('query')) {
+        $queryLower = strtolower($search);
+        $query->whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"]);
     }
 
-    // Pretvori sve u mala slova za poređenje
-    $queryLower = strtolower($query);
+    if ($status = $request->query('status')) {
+        $query->where('status', $status);
+    }
 
-    $tasks = Task::whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
-        ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"])
-        ->paginate(5);
+    if ($priority = $request->query('priority')) {
+        $query->where('priority', $priority);
+    }
+
+    $sortBy = $request->query('sort_by', 'created_at'); // default
+    $direction = $request->query('direction', 'desc'); // asc ili desc
+
+    $tasks = $query->orderBy($sortBy, $direction)->paginate(5);
 
     if ($tasks->isEmpty()) {
         return response()->json([
             'message' => 'Nema zadataka koji odgovaraju pretrazi.',
-            'query' => $query,
+            'query' => $search,
             'data' => []
         ]);
     }
 
     return TaskResource::collection($tasks);
-
 }
+
+
+public function export()
+{
+    $tasks = Task::with(['category', 'taskList'])->get();
+
+    $csv = "ID,Title,Status,Priority,Deadline,Category,TaskList\n";
+
+    foreach ($tasks as $task) {
+        $category = $task->category ? $task->category->name : 'N/A';
+        $taskList = $task->taskList ? $task->taskList->name : 'N/A';
+
+        $csv .= "{$task->id},\"{$task->title}\",{$task->status},{$task->priority},{$task->deadline},{$category},{$taskList}\n";
+    }
+
+    return Response::make($csv, 200, [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename=\"tasks_export.csv\"',
+    ]);
+}
+
 }
