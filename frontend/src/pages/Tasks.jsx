@@ -17,6 +17,7 @@ export default function Tasks() {
   const [searchParams] = useSearchParams();
 const [lists, setLists] = useState([]);
   const listId = searchParams.get("list_id");
+const [categories, setCategories] = useState([]);
 
   // --- Učitavanje zadataka sa filtriranjem i paginacijom ---
   const fetchTasks = (page = 1) => {
@@ -69,6 +70,15 @@ const [lists, setLists] = useState([]);
 }, []);
 
 
+// --- Učitavanje kategorija iz baze ---
+useEffect(() => {
+  api.get("/task-categories")
+    .then((res) => {
+      setCategories(res.data.data); // Laravel Resource vraća data array
+    })
+    .catch((err) => console.error("❌ Greška pri učitavanju kategorija:", err));
+}, []);
+
   // --- Kreiranje ili ažuriranje zadatka ---
  const handleCreateOrUpdate = (data) => {
   // 🔐 Provera da li je korisnik prijavljen
@@ -81,10 +91,17 @@ const [lists, setLists] = useState([]);
 // Formatiraj podatke pre slanja
 const formattedData = {
   ...data,
-  task_list_id: Number(data.task_list_id) || Number(listId) || 1,
+  title: data.title?.trim() || "",
+  description: data.description?.trim() || "",
+  priority: data.priority || null,
+  status: data.status || null,
   deadline: data.deadline ? new Date(data.deadline).toISOString().split("T")[0] : null,
-  estimated_hours: Number(data.estimated_hours) || null,
+  estimated_hours: data.estimated_hours ? Number(data.estimated_hours) : null,
+  category_id: data.category_id ? Number(data.category_id) : null,
+  task_list_id: data.task_list_id ? Number(data.task_list_id) : (listId ? Number(listId) : null),
 };
+
+console.log("📦 Šaljem na backend:", formattedData);
 
 const req = editTask
   ? api.put(`/tasks/${editTask.id}`, formattedData)
@@ -198,9 +215,20 @@ const req = editTask
               }
               description={`Rok: ${task.deadline || "Nema roka"}`}
               onEdit={() => {
-                setEditTask(task);
-                setShowModal(true);
-              }}
+  const taskData = {
+    ...task,
+    // ako backend šalje ugnježdene objekte:
+    category_id: task.category_id || task.category?.id || "",
+    task_list_id: task.task_list_id || task.taskList?.id || "",
+    // formatiraj datum (da ne bude null ili full ISO string)
+    deadline: task.deadline ? task.deadline.split("T")[0] : "",
+  };
+
+  console.log("📋 Edit modal data:", taskData); // vidi u konzoli da li ima category_id i task_list_id
+  setEditTask(taskData);
+  setShowModal(true);
+}}
+
               onDelete={() => handleDelete(task.id)}
             />
           ))
@@ -271,6 +299,16 @@ const req = editTask
               placeholder: "npr. 5",
             },
             {
+  name: "category_id",
+  label: "Kategorija",
+  type: "select",
+  options: categories.map((cat) => ({
+    value: cat.id,
+    label: cat.name,
+  })),
+},
+
+            {
   name: "task_list_id",
   label: "Lista",
   type: "select",
@@ -278,7 +316,11 @@ const req = editTask
     value: list.id,
     label: list.name || list.title || `Lista ${list.id}`,
   })),
+  // ✅ Dodaj defaultnu vrednost ako editujemo postojeći task
+initialValue: editTask?.task_list_id || "",
+
 },
+
 
           ]}
           initialData={editTask || {}}
