@@ -10,7 +10,7 @@ class TaskListController extends Controller
 {
     public function index()
     {
-        $taskLists = TaskList::with(['user', 'tasks'])->paginate(3);
+        $taskLists = TaskList::with(['user', 'tasks'])->paginate(10);
 
         return TaskListResource::collection($taskLists);
     }

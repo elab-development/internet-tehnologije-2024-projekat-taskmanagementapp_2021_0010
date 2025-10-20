@@ -15,7 +15,7 @@ export default function Tasks() {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchParams] = useSearchParams();
-
+const [lists, setLists] = useState([]);
   const listId = searchParams.get("list_id");
 
   // --- Učitavanje zadataka sa filtriranjem i paginacijom ---
@@ -58,6 +58,17 @@ export default function Tasks() {
     fetchTasks();
   }, [listId, status, priority]);
 
+
+  useEffect(() => {
+  api
+    .get("/task-lists")
+    .then((res) => {
+      setLists(res.data.data); // ako je tvoja API struktura drugačija, prilagodi
+    })
+    .catch((err) => console.error("❌ Greška pri učitavanju lista:", err));
+}, []);
+
+
   // --- Kreiranje ili ažuriranje zadatka ---
  const handleCreateOrUpdate = (data) => {
   // 🔐 Provera da li je korisnik prijavljen
@@ -67,9 +78,18 @@ export default function Tasks() {
     return;
   }
 
-  const req = editTask
-    ? api.put(`/tasks/${editTask.id}`, data)
-    : api.post(`/tasks`, { ...data, task_list_id: listId || 1 });
+// Formatiraj podatke pre slanja
+const formattedData = {
+  ...data,
+  task_list_id: Number(data.task_list_id) || Number(listId) || 1,
+  deadline: data.deadline ? new Date(data.deadline).toISOString().split("T")[0] : null,
+  estimated_hours: Number(data.estimated_hours) || null,
+};
+
+const req = editTask
+  ? api.put(`/tasks/${editTask.id}`, formattedData)
+  : api.post("/tasks", formattedData);
+
 
   req
     .then(() => {
@@ -250,6 +270,16 @@ export default function Tasks() {
               type: "number",
               placeholder: "npr. 5",
             },
+            {
+  name: "task_list_id",
+  label: "Lista",
+  type: "select",
+  options: lists.map((list) => ({
+    value: list.id,
+    label: list.name || list.title || `Lista ${list.id}`,
+  })),
+},
+
           ]}
           initialData={editTask || {}}
           onSubmit={handleCreateOrUpdate}
