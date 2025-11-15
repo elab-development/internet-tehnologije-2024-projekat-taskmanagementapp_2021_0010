@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\V1\UserResource;
+use Illuminate\Support\Facades\Auth;
+
 class UserController extends Controller
 {
     // GET /api/v1/users
@@ -27,7 +29,7 @@ class UserController extends Controller
             'role' => 'in:admin,user,guest',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+    //    $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
 
         return new UserResource($user);
@@ -55,9 +57,10 @@ class UserController extends Controller
             'role' => 'in:admin,user,guest',
         ]);
 
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        }
+        //automatski hesira 
+        // if (isset($validated['password'])) {
+        //     $validated['password'] = Hash::make($validated['password']);
+        // }
 
         $user->update($validated);
 
@@ -73,4 +76,36 @@ class UserController extends Controller
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+     //==============================================================================================
+    //ZA POJEDINACNOG USERA
+ //==================================================================================================
+ public function showMe()
+{
+        $user = Auth::user(); 
+    return new UserResource($user);
+}
+
+
+public function updateMe(Request $request)
+{
+       /** @var \App\Models\User $user */
+      $user = Auth::user();
+
+
+    $validated = $request->validate([
+        'name' => 'sometimes|string|max:255',
+        //“proveri da li je email jedinstven među svim korisnicima osim korisnika sa ID 5 npr”.
+        'email' => 'sometimes|email|unique:users,email,' . $user->id,
+        'phone' => 'nullable|string|max:20',
+        'password' => 'nullable|string|min:6',
+        'role' => 'in:admin,user,guest',
+    ]);
+
+    $user->update($validated);
+
+    return new UserResource($user);
+}
+
+
 }

@@ -20,6 +20,7 @@ class TaskListResource extends JsonResource
             'description' => $this->description,
             'is_favorite' => $this->is_favorite,
             'user' => new UserResource($this->whenLoaded('user')),
+            //tasks je hasMany relacija
             'tasks' => TaskResource::collection($this->whenLoaded('tasks')),
         ];
     }

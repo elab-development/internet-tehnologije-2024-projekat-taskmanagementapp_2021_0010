@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\TaskCategory;
 use Illuminate\Http\Request;
 use App\Http\Resources\V1\TaskCategoryResource;
+use Illuminate\Support\Facades\Auth;
+
 class TaskCategoryController extends Controller
 {
     public function index()
@@ -26,7 +28,7 @@ class TaskCategoryController extends Controller
     }
 
     public function show($id)
-    {
+    {  
         $category = TaskCategory::find($id);
         if (!$category) return response()->json(['error' => 'Category not found'], 404);
         return new TaskCategoryResource($category);
@@ -38,6 +40,7 @@ class TaskCategoryController extends Controller
         if (!$category) return response()->json(['error' => 'Category not found'], 404);
 
         $validated = $request->validate([
+            //, . $id → kaže: „dozvoli da vrednost bude ista kao ona kod reda sa ovim ID-jem“
             'name' => 'sometimes|string|max:255|unique:task_categories,name,' . $id,
             'description' => 'nullable|string',
         ]);

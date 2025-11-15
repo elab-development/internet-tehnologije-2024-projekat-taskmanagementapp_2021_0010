@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            //Standardni bcrypt heš u Laravelu je 60 karaktera.pa kolona bude “pravilne veličine” za bcrypt (60 karaktera),
             $table->string('password', 60)->change();
 
         });

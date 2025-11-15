@@ -20,7 +20,7 @@ class Task extends Model
         'deadline',
         'estimated_hours'
     ];
-
+ 
     public function taskList()
 {
     return $this->belongsTo(TaskList::class);

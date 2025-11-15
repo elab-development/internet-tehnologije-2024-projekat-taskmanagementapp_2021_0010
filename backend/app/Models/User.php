@@ -39,6 +39,7 @@ public function taskLists()
      *
      * @var list<string>
      */
+    //Lista atributa koje Laravel nikada neće prikazati kada model pretvoriš u JSON.
     protected $hidden = [
         'password',
         'remember_token',
@@ -49,10 +50,12 @@ public function taskLists()
      *
      * @return array<string, string>
      */
+    //Laravel kroz casts() određuje kako da konvertuje podatke iz baze u PHP formate automatski.
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+        //Automatski hešira lozinke prilikom create/update
             'password' => 'hashed',
         ];
     }

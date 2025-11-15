@@ -1,9 +1,8 @@
 <?php
 
 namespace Database\Factories;
-
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TaskList>
  */
@@ -16,8 +15,9 @@ class TaskListFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-        'user_id' => \App\Models\User::factory(),
+
+    return [
+     //  'user_id' => \App\Models\User::factory(), ne treba u samom seederu to regulisano
         'name' => $this->faker->sentence(3),
         'description' => $this->faker->sentence(),
         'is_favorite' => $this->faker->boolean(),

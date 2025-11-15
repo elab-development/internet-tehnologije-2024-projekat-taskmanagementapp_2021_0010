@@ -14,11 +14,12 @@ class TaskListSeeder extends Seeder
     public function run(): void
     {
         $users = User::all();
-
+//“Za svaku od te 3 liste, postavi user_id = ID trenutnog korisnika iz petlje.”
         foreach ($users as $user) {
             TaskList::factory()->count(3)->create([
                 'user_id' => $user->id,
             ]);
+            //Sve ostalo što nisi ručno prosledila — Laravel automatski generiše pomoću Faker-a.
         }
     }
 }

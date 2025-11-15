@@ -14,8 +14,6 @@ class UserFactory extends Factory
     /**
      * The current password being used by the factory.
      */
-    protected static ?string $password;
-
     /**
      * Define the model's default state.
      *
@@ -25,21 +23,15 @@ class UserFactory extends Factory
     {
         return [
         'name' => $this->faker->name(),
+        //safe email- To su adrese koje ne mogu stvarno poslati poštu nikome, pa su potpuno sigurne za test podatke, baze i seed-ove.
         'email' => $this->faker->unique()->safeEmail(),
         'phone' => $this->faker->phoneNumber(),
-        'password' => bcrypt('password'),
+        //laravel hešira automatski zbog 'hashed' cast-a
+        'password' => 'password',
         'role' => $this->faker->randomElement(['admin', 'user', 'guest']),
     ];
         
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
-    }
+  
 }
