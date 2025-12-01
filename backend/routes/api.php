@@ -31,6 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::get('tasks/due-soon', [TaskController::class, 'dueSoon']);
         Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
         Route::get('/tasks-in-progress', [DashboardController::class, 'tasksInProgress']);
+        Route::get('/holidays-tasks', [DashboardController::class, 'holidaysAndTasks']);
+
     });
 
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
