@@ -10,16 +10,16 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Sprečava podrazumevano ponašanje pretraživača pri podnošenju forme (koje bi obično bilo osvežavanje stranice).
     setError("");
 
     try {
 
 
-      // 2️⃣ pošalji login zahtev
+    // Šalje POST zahtev na endpoint /login na API serveru, prosleđujući unete vrednosti email i password kao telo zahteva. await čeka odgovor servera.
       const res = await axios.post("/login", { email, password });
 
-      // 3️⃣ možeš sačuvati token ako želiš u localStorage
+      // Čuvanje Podataka (Ako je uspešno):
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
@@ -44,7 +44,7 @@ export default function Login() {
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}//onChange osigurava da se stanje ažurira pri svakom pritisku tastera (tzv. kontrolisana komponenta).
               required
             />
           </div>

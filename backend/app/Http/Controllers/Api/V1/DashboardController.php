@@ -34,8 +34,7 @@ public function stats()
         ->where('task_lists.user_id', $userId)
         ->select(
             'task_categories.name as category',
-            DB::raw('COUNT(tasks.id) as total_tasks')
-        )
+          DB::raw('COUNT(tasks.id) as total')        )
         ->groupBy('task_categories.name')
         ->get();
 

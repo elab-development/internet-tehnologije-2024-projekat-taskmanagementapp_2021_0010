@@ -3,7 +3,7 @@ import api from '../api/axios';
 import StatCard from '../components/StatCard';
 import { List, CheckCircle, AlertTriangle, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import { Chart } from "react-google-charts";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -11,8 +11,12 @@ export default function Dashboard() {
     totalLists: 0,
     completed: 0,
     emergency: 0,
+    tasksByStatus: [], // NOVO
+    tasksByCategory: [], // NOVO
+    tasksByPriority: [], // NOVO
   });
-
+  const [motivation, setMotivation] = useState({ quote: '', author: '' }); // NOVO STANJE
+  const [holidaysData, setHolidaysData] = useState(null);
   const [tasksInProgress, setTasksInProgress] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -31,11 +35,31 @@ export default function Dashboard() {
 
   useEffect(() => {
     api.get('/dashboard-stats')
-      .then((res) => setStats(res.data))
+      .then((res) => {
+      setStats(res.data);
+      setMotivation(res.data.motivation); // IZVLAČENJE CITATA
+    })
       .catch((err) => console.error(err));
 
-    fetchTasks(); // ✅ učitaj prvu stranicu
+    fetchTasks(); // učitaj prvu stranicu
+    api.get('/holidays-tasks')
+    .then((res) => setHolidaysData(res.data))
+    .catch((err) => console.error(err));
   }, []);
+
+//API vraća podatke kao niz objekata. Za Google Charts potreban je niz nizova (Array of Arrays).
+  function formatChartData(data, key, label) {
+  if (!data || data.length === 0) return [[label, "Total"], ["No data", 0]];
+
+  return [
+    [label, "Total"],
+    ...data.map(item => [
+      item[key] ?? "Unknown",  // Fallback ako je null
+      Number(item.total) || 0
+    ])
+  ];
+}
+
 
   return (
     <div className="dashboard">
@@ -44,6 +68,25 @@ export default function Dashboard() {
         <div>
           <h1>Dashboard</h1>
           <p>Welcome back! Here's your overview.</p>
+          {/* NOVO: Motivacija */}
+    {motivation.quote && (
+      <blockquote style={{ 
+        fontStyle: 'italic', 
+        fontSize: '1rem', 
+        borderLeft: '4px solid #ff8fa3', 
+        paddingLeft: '15px', 
+        margin: '15px 0', 
+        color: '#ccc' 
+      }}>
+        "{motivation.quote}" 
+        <footer style={{ 
+          fontSize: '0.9rem', 
+          color: '#999', 
+          marginTop: '5px' 
+        }}>— {motivation.author}</footer>
+      </blockquote>
+    )}
+    {/* KRAJ NOVE SEKCIJE */}
         </div>
 
         <div className="dashboard-buttons">
@@ -63,6 +106,109 @@ export default function Dashboard() {
         <StatCard title="Completed Tasks" value={stats.completed} icon={<CheckCircle size={18} />} textColor="#ff8fa3" />
         <StatCard title="Emergency Tasks" value={stats.emergency} icon={<AlertTriangle size={18} />} textColor="#ff1744" />
       </div>
+
+{/* Sekcija za praznike i zadatke s rokom na praznik */}
+{holidaysData && (
+    <div className="holidays-section">
+        <h2>Holidays & Task Deadlines (2025)</h2>
+        
+        {/* Prikaz zadataka s rokom na praznik */}
+        {holidaysData.tasks_due_on_holidays && holidaysData.tasks_due_on_holidays.length > 0 ? (
+            <div className="holidays-tasks-list">
+                <p style={{ color: '#ff8fa3', fontWeight: 'bold' }}>
+                     {holidaysData.tasks_due_on_holidays.length} tasks have deadlines on a holiday!
+                </p>
+                <ul>
+                    {holidaysData.tasks_due_on_holidays.map((task, index) => (
+                        <li key={index} className="holiday-task-item">
+                            **{task.title}** (Deadline: {task.deadline}) - Priority: {task.priority.toUpperCase()}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ) : (
+            <p style={{ color: '#ccc' }}>
+                 Good news! No tasks are currently due on a public holiday in 2025.
+            </p>
+        )}
+
+        {/* Dugme za prikaz svih praznika */}
+        <details style={{ marginTop: '15px' }}>
+            <summary style={{ color: '#ffb3d9', cursor: 'pointer' }}>
+                View Full List of 2025 Holidays ({holidaysData.holidays.length})
+            </summary>
+            <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '10px' }}>
+                {holidaysData.holidays.map((holiday, index) => (
+                    <li key={index} style={{ color: '#999' }}>
+                        **{holiday.name}** on {holiday.date}
+                    </li>
+                ))}
+            </ul>
+        </details>
+    </div>
+)}
+{/* KRAJ Sekcije za praznike */}
+
+      {/* CHARTOVI */}
+<div className="charts-section">
+
+  {/* Tasks by Status - PieChart */}
+  <div className="chart-box">
+    <h3>Tasks by Status</h3>
+    <Chart
+      chartType="PieChart"
+      data={formatChartData(stats.tasksByStatus, "status", "Status")}
+      width={"100%"}
+      height={"100%"}
+      options={{
+        pieHole: 0.4,
+        backgroundColor: "transparent",
+        legendTextStyle: { color: "#fff" },
+        titleTextStyle: { color: "#fff" },
+        colors: ['#ff8fa3', '#ffb3d9', '#ff4da6'],
+      }}
+    />
+  </div>
+
+  {/* Tasks by Priority - ColumnChart */}
+  <div className="chart-box">
+    <h3>Tasks by Priority</h3>
+    <Chart
+      chartType="ColumnChart"
+      data={formatChartData(stats.tasksByPriority, "priority", "Priority")}
+      width={"100%"}
+      height={"100%"}
+      options={{
+        backgroundColor: "transparent",
+        legendTextStyle: { color: "#fff" },
+        titleTextStyle: { color: "#fff" },
+        hAxis: { textStyle: { color: "#ff8fa3" } },
+        vAxis: { textStyle: { color: "#ff8fa3" } },
+        colors: ['#ff8fa3', '#ffb3d9', '#ff4da6'],
+      }}
+    />
+  </div>
+{/* Tasks by Category - PieChart */}
+ <div className="chart-box">
+    <h3>Tasks by Category</h3>
+    <Chart
+      chartType="PieChart"
+      data={formatChartData(stats.tasksByCategory, "category", "Category")}
+      width={"100%"}
+      height={"100%"}
+      options={{
+        pieHole: 0,
+        backgroundColor: "transparent",
+        legendTextStyle: { color: "#fff" },
+        titleTextStyle: { color: "#fff" },
+        colors: ['#ff8fa3', '#ffb3d9', '#ff4da6'],
+      }}
+    />
+  </div>
+
+
+</div>
+
 
       {/* Sekcija za zadatke u toku */}
       <div className="tasks-section">
@@ -88,6 +234,8 @@ export default function Dashboard() {
             ))
           )}
         </div>
+
+        
 
         {/* ✅ Paginacija */}
         <div className="pagination">

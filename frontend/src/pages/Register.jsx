@@ -31,7 +31,7 @@ export default function Register() {
   });
 
   console.log(res.data);
-  alert("✅ Registration successful!");
+  alert(" Registration successful!");
   navigate("/login");
     } catch (err) {
       console.error(err.response?.data || err.message);

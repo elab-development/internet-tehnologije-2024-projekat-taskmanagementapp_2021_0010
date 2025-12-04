@@ -5,11 +5,12 @@ import api from "../api/axios";
 export default function Logout() {
   const navigate = useNavigate();
 
+  //Osigurava da se funkcija performLogout poziva samo jednom kada se komponenta učita
   useEffect(() => {
     const performLogout = async () => {
       const token = localStorage.getItem("token");
 
-      // 🚫 Ako korisnik nije ulogovan — odmah ga vrati na login
+      //  Ako korisnik nije ulogovan — odmah ga vrati na login
       if (!token) {
         alert("Niste prijavljeni!");
         console.warn("Nema tokena — preusmeravam na login.");
@@ -18,7 +19,7 @@ export default function Logout() {
       }
 
       try {
-        // ✅ Logout samo ako ima token (ulogovan korisnik)
+        //  Logout samo ako ima token (ulogovan korisnik)
         await api.post("/logout");
         console.log("Logout uspešan");
       } catch (err) {
@@ -37,6 +38,7 @@ export default function Logout() {
     };
 
     performLogout();
+    //Moderne verzije Reacta/ESLinta zahtevaju da se sve funkcije i varijable korišćene unutar useEffect bloka (kao što je Maps) navedu u nizu zavisnosti
   }, [navigate]);
 
   return (
@@ -51,7 +53,7 @@ export default function Logout() {
         fontSize: "1.2rem",
       }}
     >
-      Odjavljujemo vas...
+      Logging out...
     </div>
   );
 }

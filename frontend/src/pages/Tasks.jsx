@@ -8,24 +8,27 @@ import "../App.css";
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
-  const [status, setStatus] = useState("svi");
-  const [priority, setPriority] = useState("svi");
+  const [status, setStatus] = useState("all");
+  const [priority, setPriority] = useState("all");
   const [showModal, setShowModal] = useState(false);
-  const [editTask, setEditTask] = useState(null);
+  const [editTask, setEditTask] = useState(null);                                                        
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [searchParams] = useSearchParams();
-const [lists, setLists] = useState([]);
+  const [lists, setLists] = useState([]);
+   const [categories, setCategories] = useState([]);
+
+  //Pokušava da izvuče vrednost pridruženu ključu list_id iz trenutnog URL-a.
   const listId = searchParams.get("list_id");
-const [categories, setCategories] = useState([]);
 
   // --- Učitavanje zadataka sa filtriranjem i paginacijom ---
+  //Funkcija prihvata opcioni argument page. Ako nije prosleđen, podrazumevana vrednost je 1.
   const fetchTasks = (page = 1) => {
     const url = listId ? `/task-lists/${listId}` : `/tasks?page=${page}`;
-    api
-      .get(url)
+    api.get(url)
       .then((res) => {
         let data = listId ? res.data.data.tasks : res.data.data;
+        //normalizacija- sigurava da je data uvek niz, čak i ako API greškom vrati samo jedan objekat umesto niza bitno zbog mapiranja i filtriranja
         if (!Array.isArray(data)) data = [data];
 
         // Filtriranje po statusu i prioritetu
@@ -47,26 +50,27 @@ const [categories, setCategories] = useState([]);
 
         setTasks(filtered);
 
+//Azuriranje paginacije  ako je API u odgovoru poslao objekat meta,p, koji se dodaju kod paginacije koji sadrži current_page i last_page.
         if (!listId && res.data.meta) {
           setCurrentPage(res.data.meta.current_page);
           setLastPage(res.data.meta.last_page);
         }
       })
-      .catch((err) => console.error("❌ Greška pri učitavanju zadataka:", err));
+      .catch((err) => console.error("Error occured during loading data:", err));
   };
 
   useEffect(() => {
     fetchTasks();
   }, [listId, status, priority]);
 
-
+//Ovi podaci se koriste za popunjavanje padajućeg menija u ModalForm
   useEffect(() => {
   api
     .get("/task-lists")
     .then((res) => {
-      setLists(res.data.data); // ako je tvoja API struktura drugačija, prilagodi
+      setLists(res.data.data); 
     })
-    .catch((err) => console.error("❌ Greška pri učitavanju lista:", err));
+    .catch((err) => console.error(" Error occured during loading lists...:", err));
 }, []);
 
 
@@ -74,22 +78,24 @@ const [categories, setCategories] = useState([]);
 useEffect(() => {
   api.get("/task-categories")
     .then((res) => {
-      setCategories(res.data.data); // Laravel Resource vraća data array
+      setCategories(res.data.data); 
     })
-    .catch((err) => console.error("❌ Greška pri učitavanju kategorija:", err));
+    .catch((err) => console.error(" Error occured during loading categories...", err));
 }, []);
 
   // --- Kreiranje ili ažuriranje zadatka ---
  const handleCreateOrUpdate = (data) => {
-  // 🔐 Provera da li je korisnik prijavljen
+  //  Provera da li je korisnik prijavljen
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("Morate biti prijavljeni da biste dodavali ili menjali zadatke!");
+    alert("You must be logged-in for this actions");
     return;
   }
 
 // Formatiraj podatke pre slanja
 const formattedData = {
+  //Preuzima sve postojeće parove ključ/vrednost iz originalnog data objekta (koji je stigao iz ModalForm komponente) i kopira ih u novi objekat formattedData
+  //Ovo osigurava da su sva polja koja nisu eksplicitno navedena ispod i dalje uključena.
   ...data,
   title: data.title?.trim() || "",
   description: data.description?.trim() || "",
@@ -98,10 +104,11 @@ const formattedData = {
   deadline: data.deadline ? new Date(data.deadline).toISOString().split("T")[0] : null,
   estimated_hours: data.estimated_hours ? Number(data.estimated_hours) : null,
   category_id: data.category_id ? Number(data.category_id) : null,
+                                                                  //iz URLa
   task_list_id: data.task_list_id ? Number(data.task_list_id) : (listId ? Number(listId) : null),
 };
 
-console.log("📦 Šaljem na backend:", formattedData);
+console.log(" Šaljem na backend:", formattedData);
 
 const req = editTask
   ? api.put(`/tasks/${editTask.id}`, formattedData)
@@ -109,19 +116,19 @@ const req = editTask
 
 
   req
-    .then(() => {
+    .then(() => { // Ako je Promise u 'req' uspešan, pokreni ovo
       fetchTasks();
       setShowModal(false);
       setEditTask(null);
     })
     .catch((err) => {
-      // ⚠️ Ako je token nevažeći ili istekla sesija
+      // Ako je token nevažeći ili istekla sesija
       if (err.response?.status === 401) {
-        alert("Vaša sesija je istekla. Prijavite se ponovo!");
+        alert("You must be logged in!");
         localStorage.removeItem("token");
         window.location.href = "/login"; // preusmeri korisnika
       } else {
-        console.error("❌ Greška pri čuvanju zadatka:", err);
+        console.error("Error occured:", err);
       }
     });
 };
@@ -147,25 +154,27 @@ const req = editTask
 const handleExport = async () => {
   try {
     const response = await api.get("/tasks/export", {
-      responseType: "blob", // 📦 važno! da bi preuzeo fajl kao binarni sadržaj
+      responseType: "blob", //Ovo je instrukcija za Axios (HTTP klijent) da očekuje odgovor u formatu Binary Large Object (Blob) predstavlja sirove, neobrađene podatke (bajtove)., a ne kao standardni JSON
     });
 
-    // Kreiraj URL za fajl u memoriji
+    //Ova metoda generiše jedinstven, privremeni URL koji ukazuje na podatke koji se sada nalaze u memoriji pretraživača.
+   //Ovaj URL je neophodan jer se HTML link (<a> tag) ne može direktno povezati sa Blob objektom.
     const url = window.URL.createObjectURL(new Blob([response.data]));
 
     // Kreiraj <a> element i simuliraj klik za preuzimanje
     const link = document.createElement("a");
     link.href = url;
+    //Atribut download govori pretraživaču da, kada se link klikne, sačuva sadržaj sa imenom "tasks_export.csv"
     link.setAttribute("download", "tasks_export.csv");
     document.body.appendChild(link);
     link.click();
 
-    // Očisti
+    // Nakon što je preuzimanje pokrenuto, važno je osloboditi memoriju i očistiti DOM.
     link.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("❌ Greška pri izvozu:", error);
-    alert("Došlo je do greške pri izvozu zadataka!");
+    console.error(" Greška pri izvozu:", error);
+    alert("Error occured during export!");
   }
 };
 
@@ -175,7 +184,7 @@ const handleExport = async () => {
     <div className="tasks-page">
       <div className="page-header">
         <h1 className="font-bold text-white mb-6" style={{ fontSize: "2rem" }}>
-          {listId ? "Zadaci u listi" : "Svi zadaci"}
+          {listId ? "Tasks in list" : "All tasks"}
         </h1>
 
         {/* Filteri */}
@@ -188,10 +197,10 @@ const handleExport = async () => {
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="svi">Svi statusi</option>
-              <option value="započet">Započet</option>
-              <option value="u toku">U toku</option>
-              <option value="završen">Završen</option>
+              <option value="svi">All status</option>
+              <option value="započet">Started</option>
+              <option value="u toku">In Progress</option>
+              <option value="završen">Completed</option>
             </select>
 
             <select
@@ -199,11 +208,11 @@ const handleExport = async () => {
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
             >
-              <option value="svi">Svi prioriteti</option>
-              <option value="nizak">Nizak</option>
-              <option value="srednji">Srednji</option>
-              <option value="visok">Visok</option>
-              <option value="hitno">Hitno</option>
+              <option value="svi">All priorities</option>
+              <option value="nizak">Low</option>
+              <option value="srednji">Medium</option>
+              <option value="visok">High</option>
+              <option value="hitno">Emergent</option>
             </select>
           </div>
           
@@ -211,21 +220,23 @@ const handleExport = async () => {
 
         {/* Dugme za dodavanje zadatka */}
         <button className="pink-btn" onClick={() => setShowModal(true)}>
-          + Dodaj zadatak
+          + Add task
         </button>
       </div>
 
       {/* Lista zadataka */}
       <div className="tasks-list">
         {tasks.length === 0 ? (
-          <p>Nema zadataka za prikaz.</p>
+          <p>There is no tasks to show.</p>
         ) : (
           tasks.map((task) => (
+            //Svaki element u tasks nizu se pretvara u ItemCard komponentu:
             <ItemCard
               key={task.id}
               title={task.title}
               subtitle={
                 <>
+                {/* Prazne vitičaste zagrade sa razmakom unutra, {" "}, koriste se u React/JSX kodu da bi se ubacio jedan razmak (space) između dva susedna HTML (JSX) elementa, a da se pritom ne naruši struktura ili stilizovanje. */}
                   Prioritet:{" "}
                   <span
                     className={`task-priority ${
@@ -240,18 +251,18 @@ const handleExport = async () => {
                   | Status: {task.status || "N/A"}
                 </>
               }
-              description={`Rok: ${task.deadline || "Nema roka"}`}
+              description={`Rok: ${task.deadline || "There`s no deadline"}`}
               onEdit={() => {
   const taskData = {
     ...task,
-    // ako backend šalje ugnježdene objekte:
+    // proveravajući da li su ID-jevi ugnježdeni (npr. task.category?.id) ili su direktno na objektu.
     category_id: task.category_id || task.category?.id || "",
     task_list_id: task.task_list_id || task.taskList?.id || "",
     // formatiraj datum (da ne bude null ili full ISO string)
     deadline: task.deadline ? task.deadline.split("T")[0] : "",
   };
 
-  console.log("📋 Edit modal data:", taskData); // vidi u konzoli da li ima category_id i task_list_id
+  console.log(" Edit modal data:", taskData); // vidi u konzoli da li ima category_id i task_list_id
   setEditTask(taskData);
   setShowModal(true);
 }}
@@ -261,10 +272,10 @@ const handleExport = async () => {
           ))
         )}
       </div>
-{/* 📤 Dugme za izvoz CSV-a */}
+{/*  Dugme za izvoz CSV-a */}
 <div className="export-btn-container">
   <button className="pink-btn" onClick={handleExport}>
-    📤 Izvezi CSV
+    📤 Get CSV
   </button>
 </div>
 
@@ -279,6 +290,8 @@ const handleExport = async () => {
           >
             ←
           </button>
+          {/* Dobijate niz čija dužina odgovara ukupnom broju stranica. */}
+                                {/* Prvi argument (vrednost elementa) se ignoriše jer nam je potrebna samo dužina niza. */}
           {[...Array(lastPage)].map((_, i) => (
             <button
               key={i}
@@ -300,42 +313,42 @@ const handleExport = async () => {
       {/* Modal za kreiranje/izmenu zadatka */}
       {showModal && (
         <ModalForm
-          title={editTask ? "Izmena zadatka" : "Novi zadatak"}
+          title={editTask ? "Edit task" : "New task"}
           fields={[
             {
               name: "title",
               label: "Naslov",
               type: "text",
-              placeholder: "Naslov zadatka",
+              placeholder: "Title",
             },
             {
               name: "description",
               label: "Opis",
               type: "text",
-              placeholder: "Opis zadatka",
+              placeholder: "Description",
             },
             {
               name: "priority",
               label: "Prioritet",
               type: "select",
-              options: ["nizak", "srednji", "visok", "hitno"],
+              options: ["low", "medium", "high", "emergency"],
             },
             {
               name: "status",
               label: "Status",
               type: "select",
-              options: ["započet", "u toku", "završen"],
+              options: ["started", "in progress", "finished"],
             },
-            { name: "deadline", label: "Rok", type: "date" },
+            { name: "deadline", label: "Deadline", type: "date" },
             {
               name: "estimated_hours",
-              label: "Procena sati",
+              label: "Estimated hours",
               type: "number",
-              placeholder: "npr. 5",
+              placeholder: "example: 5",
             },
             {
   name: "category_id",
-  label: "Kategorija",
+  label: "Category",
   type: "select",
   options: categories.map((cat) => ({
     value: cat.id,
@@ -345,19 +358,18 @@ const handleExport = async () => {
 
             {
   name: "task_list_id",
-  label: "Lista",
+  label: "List",
   type: "select",
   options: lists.map((list) => ({
     value: list.id,
     label: list.name || list.title || `Lista ${list.id}`,
   })),
-  // ✅ Dodaj defaultnu vrednost ako editujemo postojeći task
+  // Dodaj defaultnu vrednost ako editujemo postojeći task
 initialValue: editTask?.task_list_id || "",
 
 },
 
-
-          ]}
+ ]}
           initialData={editTask || {}}
           onSubmit={handleCreateOrUpdate}
           onClose={() => {

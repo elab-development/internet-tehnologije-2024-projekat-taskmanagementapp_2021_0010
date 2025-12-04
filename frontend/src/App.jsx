@@ -4,7 +4,7 @@ import Tasks from "./pages/Tasks";
 import Lists from "./pages/Lists";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Logout from "./pages/Logout"; // ✅ dodaj
+import Logout from "./pages/Logout"; //
 import Sidebar from "./components/Sidebar";
 import Breadcrumbs from "./components/Breadcrumbs";
 import "./App.css";
@@ -49,7 +49,7 @@ function AppContent() {
           <Route path="/lists" element={<Lists />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/logout" element={<Logout />} /> {/* ✅ Logout ruta */}
+          <Route path="/logout" element={<Logout />} /> 
         </Routes>
       </main>
     </div>

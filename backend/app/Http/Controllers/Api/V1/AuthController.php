@@ -15,6 +15,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+                                        //ora biti jedinstveno u koloni email tabele users.
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|confirmed',
              'phone' => 'nullable|string|max:20',
@@ -24,27 +25,27 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => $validated['password'],
              'phone' => $validated['phone'],
               'role' => $validated['role'],
         ]);
 
+        //Ova linija koristi Laravel Sanctum za kreiranje novog API tokena za novokreiranog korisnika.
         $token = $user->createToken('auth_token')->plainTextToken;
-
+        //Vraća JSON odgovor klijentu
         return response()->json([
             'user' => $user,
             'token' => $token,
         ]);
     }
 
-    // Login
     public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-//first() izvršava query **i vraća samo prvi rezultat iz baze pre toga je samo sablon za upit
+//first() izvršava query i vraća samo prvi rezultat iz baze pre toga je samo sablon za upit
 // ne treba get() jer bi on vraćao kolekciju svih korisnika 
         $user = User::where('email', $request->email)->first();
 

@@ -36,7 +36,7 @@ export default function Lists() {
 
   const req = editList
     ? api.put(`/task-lists/${editList.id}`, data)
-    : api.post(`/task-lists`, { ...data, user_id: 1 }); // user_id zameni sa pravim ako imaš auth
+    : api.post(`/task-lists`, { ...data, user_id: 1 }); 
 
   req
     .then(() => {
@@ -47,27 +47,27 @@ export default function Lists() {
     .catch((err) => {
       // ako backend ipak vrati 401 (npr. token istekao)
       if (err.response?.status === 401) {
-        alert("Vaša sesija je istekla. Prijavite se ponovo!");
+        alert("You have to be logged in!");
         localStorage.removeItem("token");
         window.location.href = "/login"; // redirekt na login
       } else {
-        console.error("❌ Greška pri čuvanju liste:", err);
+        console.error("Error occured during saving list", err);
       }
     });
 };
 
 
 const handleDelete = async (id) => {
-  if (!window.confirm("Da li ste sigurni da želite da obrišete listu?")) return;
+  if (!window.confirm("Are you sure you want to delete list?")) return;
 
   try {
     await api.delete(`/task-lists/${id}`);
-    fetchTasks();
+    fetchLists();
   } catch (err) {
     if (err.response?.status === 401) {
-      alert("Morate biti prijavljeni da biste obrisali listu!");
+        alert("You have to be logged in!");
     } else {
-      console.error("Greška pri brisanju:", err);
+      console.error("Error occured during deleting list", err);
     }
   }
 };
