@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
-//Uvozi dve ikone iz popularne biblioteke ikona Lucide:
+import { Menu, X, User, LogOut } from "lucide-react";//Uvozi dve ikone iz popularne biblioteke ikona Lucide:
 //Menu: Ikona za hamburger meni (prikazuje se kada je bočna traka zatvorena).
 //X: Ikona za zatvaranje (prikazuje se kada je bočna traka otvorena).
 import { NavLink } from "react-router-dom";
 
-export default function Sidebar() {
+export default function Sidebar({ onMyAccountClick }) {
+  
   const [open, setOpen] = useState(false);
 
   return (
@@ -22,9 +22,24 @@ export default function Sidebar() {
           <NavLink to="/" end>Dashboard</NavLink>
           <NavLink to="/lists">Lists</NavLink>
           <NavLink to="/tasks">Tasks</NavLink>
-          <NavLink to="/logout">Logout</NavLink>
+          </nav>
 
-        </nav>
+      <div className="sidebar-footer">
+       
+    <a      href="#" 
+            className="sidebar-link-btn" 
+            onClick={(e) => {
+              e.preventDefault(); // Sprečava osvežavanje stranice
+              setOpen(false);     // Zatvori sidebar na mobilnom
+              onMyAccountClick(); // Otvori modal iz App.jsx
+            }}
+          >
+            <User size={18} /> My Account
+          </a>
+    <NavLink to="/logout" onClick={() => setOpen(false)}>
+      <LogOut size={18} /> Logout
+    </NavLink>
+  </div>
       </aside>
     </>
   );

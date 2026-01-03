@@ -33,14 +33,14 @@ export default function Tasks() {
 
         // Filtriranje po statusu i prioritetu
         let filtered = data;
-        if (status !== "svi") {
+        if (status !== "all") {
           filtered = filtered.filter(
             (task) =>
               task.status &&
               task.status.toLowerCase() === status.toLowerCase()
           );
         }
-        if (priority !== "svi") {
+        if (priority !== "all") {
           filtered = filtered.filter(
             (task) =>
               task.priority &&

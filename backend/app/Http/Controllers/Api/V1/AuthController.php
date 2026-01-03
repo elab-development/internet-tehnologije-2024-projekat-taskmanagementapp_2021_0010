@@ -19,15 +19,15 @@ class AuthController extends Controller
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|confirmed',
              'phone' => 'nullable|string|max:20',
-             'role' => 'nullable|in:admin,user,guest'
+             'role' => 'nullable|in:user,guest'
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
-             'phone' => $validated['phone'],
-              'role' => $validated['role'],
+            'phone' => $validated['phone'] ?? null, 
+            'role' => $validated['role'] ?? 'user',
         ]);
 
         //Ova linija koristi Laravel Sanctum za kreiranje novog API tokena za novokreiranog korisnika.
@@ -57,10 +57,20 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // return response()->json([
+        //     'message' => 'Succesfully logined',
+        //     'token' => $token,
+        // ]);
         return response()->json([
-            'message' => 'Succesfully logined',
-            'token' => $token,
-        ]);
+        'message' => 'Succesfully logined',
+        'token' => $token,
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]
+    ]);
     }
 
     // Logout

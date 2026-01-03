@@ -14,7 +14,7 @@ class UserController extends Controller
     // GET /api/v1/users
     public function index()
     {
-        $users = User::with('taskLists')->paginate(3);
+        $users = User::with('taskLists')->paginate(4);
         return UserResource::collection($users);
     }
 
@@ -99,7 +99,8 @@ public function updateMe(Request $request)
         'email' => 'sometimes|email|unique:users,email,' . $user->id,
         'phone' => 'nullable|string|max:20',
         'password' => 'nullable|string|min:6',
-        'role' => 'in:admin,user,guest',
+        // ne sme user sam sebi rolu da menja
+        //  'role' => 'in:admin,user,guest',
     ]);
 
     $user->update($validated);

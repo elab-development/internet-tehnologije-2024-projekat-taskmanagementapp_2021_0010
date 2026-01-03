@@ -18,13 +18,19 @@ export default function Login() {
 
     // Šalje POST zahtev na endpoint /login na API serveru, prosleđujući unete vrednosti email i password kao telo zahteva. await čeka odgovor servera.
       const res = await axios.post("/login", { email, password });
+        const user = res.data.user;
 
       // Čuvanje Podataka (Ako je uspešno):
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // 4️⃣ redirekcija na dashboard
-      navigate("/");
+     // navigate("/");
+     if (user.role === "admin") {
+       navigate("/admin/dashboard");
+        } else {
+        navigate("/");
+       }
     } catch (err) {
       console.error(err.response?.data || err.message);
       setError("Invalid credentials or server error.");
