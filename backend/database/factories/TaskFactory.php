@@ -24,8 +24,8 @@ class TaskFactory extends Factory
     
         'title' => $this->faker->sentence(3),
         'description' => $this->faker->paragraph(),
-        'priority' => $this->faker->randomElement(['nizak', 'srednji', 'visok','hitno']),
-        'status' => $this->faker->randomElement(['započet', 'u toku', 'završen']),
+        'priority' => $this->faker->randomElement(['low', 'medium', 'high','emergency']),
+        'status' => $this->faker->randomElement(['started', 'in progress', 'finished']),
         'deadline' => $this->faker->dateTimeBetween('-1 years', '+1 month'),
         'estimated_hours' => $this->faker->numberBetween(1, 20), 
 

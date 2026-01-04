@@ -110,7 +110,7 @@ export default function Dashboard() {
 {/* Sekcija za praznike i zadatke s rokom na praznik */}
 {holidaysData && (
     <div className="holidays-section">
-        <h2>Holidays & Task Deadlines (2025)</h2>
+        <h2>Holidays & Task Deadlines (2026)</h2>
         
         {/* Prikaz zadataka s rokom na praznik */}
         {holidaysData.tasks_due_on_holidays && holidaysData.tasks_due_on_holidays.length > 0 ? (
@@ -128,7 +128,7 @@ export default function Dashboard() {
             </div>
         ) : (
             <p style={{ color: '#ccc' }}>
-                 Good news! No tasks are currently due on a public holiday in 2025.
+                 Good news! No tasks are currently due on a public holiday in 2026.
             </p>
         )}
 

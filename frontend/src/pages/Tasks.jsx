@@ -23,65 +23,86 @@ export default function Tasks() {
 
   // --- Učitavanje zadataka sa filtriranjem i paginacijom ---
   //Funkcija prihvata opcioni argument page. Ako nije prosleđen, podrazumevana vrednost je 1.
+//   const fetchTasks = (page = 1) => {
+//     const url = listId ? `/task-lists/${listId}` : `/tasks?page=${page}`;
+//     api.get(url)
+//       .then((res) => {
+//         let data = listId ? res.data.data.tasks : res.data.data;
+//         //normalizacija- sigurava da je data uvek niz, čak i ako API greškom vrati samo jedan objekat umesto niza bitno zbog mapiranja i filtriranja
+//         if (!Array.isArray(data)) data = [data];
+
+//         // Filtriranje po statusu i prioritetu
+//         let filtered = data;
+//         if (status !== "all") {
+//           filtered = filtered.filter(
+//             (task) =>
+//               task.status &&
+//               task.status.toLowerCase() === status.toLowerCase()
+//           );
+//         }
+//         if (priority !== "all") {
+//           filtered = filtered.filter(
+//             (task) =>
+//               task.priority &&
+//               task.priority.toLowerCase() === priority.toLowerCase()
+//           );
+//         }
+
+//         setTasks(filtered);
+
+// //Azuriranje paginacije  ako je API u odgovoru poslao objekat meta,p, koji se dodaju kod paginacije koji sadrži current_page i last_page.
+//         if (!listId && res.data.meta) {
+//           setCurrentPage(res.data.meta.current_page);
+//           setLastPage(res.data.meta.last_page);
+//         }
+//       })
+//       .catch((err) => console.error("Error occured during loading data:", err));
+//   };
+
+// --- Učitavanje zadataka preko Search rute (Backend filtriranje) ---
   const fetchTasks = (page = 1) => {
-    const url = listId ? `/task-lists/${listId}` : `/tasks?page=${page}`;
+    // Ako imamo list_id, vučemo iz te liste, inače koristimo search rutu za sve
+    let url = listId 
+      ? `/task-lists/${listId}?page=${page}` 
+      : `/tasks/search?page=${page}`;
+
+    // Dodajemo filtere samo ako nije "all" i ako nismo unutar specifične liste 
+    // (Možeš dodati filtere i za listId ako backend to podržava)
+    if (!listId) {
+      if (status !== "all") url += `&status=${status}`;
+      if (priority !== "all") url += `&priority=${priority}`;
+    }
+
     api.get(url)
       .then((res) => {
-        let data = listId ? res.data.data.tasks : res.data.data;
-        //normalizacija- sigurava da je data uvek niz, čak i ako API greškom vrati samo jedan objekat umesto niza bitno zbog mapiranja i filtriranja
-        if (!Array.isArray(data)) data = [data];
+        // Laravel Resource vraća podatke u res.data.data
+        let incomingData = listId ? res.data.data.tasks : res.data.data;
+        
+        // Sigurnosna provera za niz
+        setTasks(Array.isArray(incomingData) ? incomingData : []);
 
-        // Filtriranje po statusu i prioritetu
-        let filtered = data;
-        if (status !== "all") {
-          filtered = filtered.filter(
-            (task) =>
-              task.status &&
-              task.status.toLowerCase() === status.toLowerCase()
-          );
-        }
-        if (priority !== "all") {
-          filtered = filtered.filter(
-            (task) =>
-              task.priority &&
-              task.priority.toLowerCase() === priority.toLowerCase()
-          );
-        }
-
-        setTasks(filtered);
-
-//Azuriranje paginacije  ako je API u odgovoru poslao objekat meta,p, koji se dodaju kod paginacije koji sadrži current_page i last_page.
-        if (!listId && res.data.meta) {
+        // Ažuriranje paginacije iz meta podataka (Laravel pagination)
+        if (res.data.meta) {
           setCurrentPage(res.data.meta.current_page);
           setLastPage(res.data.meta.last_page);
         }
       })
-      .catch((err) => console.error("Error occured during loading data:", err));
+      .catch((err) => console.error("Error loading data:", err));
   };
 
+// Okidač za učitavanje kada se promeni stranica, filter ili lista
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(1); // Uvek resetuj na 1. stranu kada se promeni filter
   }, [listId, status, priority]);
 
-//Ovi podaci se koriste za popunjavanje padajućeg menija u ModalForm
+// Učitavanje listi i kategorija za modale
   useEffect(() => {
-  api
-    .get("/task-lists")
-    .then((res) => {
-      setLists(res.data.data); 
-    })
-    .catch((err) => console.error(" Error occured during loading lists...:", err));
-}, []);
+    api.get("/task-lists").then((res) => setLists(res.data.data));
+    api.get("/task-categories").then((res) => setCategories(res.data.data));
+  }, []);
 
 
-// --- Učitavanje kategorija iz baze ---
-useEffect(() => {
-  api.get("/task-categories")
-    .then((res) => {
-      setCategories(res.data.data); 
-    })
-    .catch((err) => console.error(" Error occured during loading categories...", err));
-}, []);
+
 
   // --- Kreiranje ili ažuriranje zadatka ---
  const handleCreateOrUpdate = (data) => {
@@ -117,7 +138,7 @@ const req = editTask
 
   req
     .then(() => { // Ako je Promise u 'req' uspešan, pokreni ovo
-      fetchTasks();
+      fetchTasks(currentPage);
       setShowModal(false);
       setEditTask(null);
     })
@@ -136,16 +157,16 @@ const req = editTask
 
   // --- Brisanje zadatka ---
   const handleDelete = async (id) => {
-  if (!window.confirm("Da li ste sigurni da želite da obrišete zadatak?")) return;
+  if (!window.confirm("Are you sure?")) return;
 
   try {
     await api.delete(`/tasks/${id}`);
-    fetchTasks();
+    fetchTasks(currentPage);
   } catch (err) {
     if (err.response?.status === 401) {
-      alert("Morate biti prijavljeni da biste obrisali zadatak!");
+      alert("You must be logged!");
     } else {
-      console.error("Greška pri brisanju:", err);
+      console.error("Error:", err);
     }
   }
 };
@@ -197,10 +218,10 @@ const handleExport = async () => {
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="svi">All status</option>
-              <option value="započet">Started</option>
-              <option value="u toku">In Progress</option>
-              <option value="završen">Completed</option>
+              <option value="all">All status</option>
+              <option value="started">Started</option>
+              <option value="in progress">In Progress</option>
+              <option value="finished">Finished</option>
             </select>
 
             <select
@@ -208,11 +229,11 @@ const handleExport = async () => {
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
             >
-              <option value="svi">All priorities</option>
-              <option value="nizak">Low</option>
-              <option value="srednji">Medium</option>
-              <option value="visok">High</option>
-              <option value="hitno">Emergent</option>
+              <option value="all">All priorities</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="emergency">Emergency</option>
             </select>
           </div>
           
@@ -237,10 +258,10 @@ const handleExport = async () => {
               subtitle={
                 <>
                 {/* Prazne vitičaste zagrade sa razmakom unutra, {" "}, koriste se u React/JSX kodu da bi se ubacio jedan razmak (space) između dva susedna HTML (JSX) elementa, a da se pritom ne naruši struktura ili stilizovanje. */}
-                  Prioritet:{" "}
+                  Priority:{" "}
                   <span
                     className={`task-priority ${
-                      task.priority === "hitno" ? "high" : ""
+                      task.priority === "emergency" ? "emergency" : ""
                     }`}
                   >
                     {task.priority
@@ -251,7 +272,7 @@ const handleExport = async () => {
                   | Status: {task.status || "N/A"}
                 </>
               }
-              description={`Rok: ${task.deadline || "There`s no deadline"}`}
+              description={`Deadline: ${task.deadline || "There`s no deadline"}`}
               onEdit={() => {
   const taskData = {
     ...task,
@@ -317,19 +338,19 @@ const handleExport = async () => {
           fields={[
             {
               name: "title",
-              label: "Naslov",
+              label: "Title",
               type: "text",
               placeholder: "Title",
             },
             {
               name: "description",
-              label: "Opis",
+              label: "Description",
               type: "text",
               placeholder: "Description",
             },
             {
               name: "priority",
-              label: "Prioritet",
+              label: "Priority",
               type: "select",
               options: ["low", "medium", "high", "emergency"],
             },

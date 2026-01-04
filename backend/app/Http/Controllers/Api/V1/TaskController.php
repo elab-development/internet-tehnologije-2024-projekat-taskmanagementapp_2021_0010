@@ -48,8 +48,8 @@ class TaskController extends Controller
             'category_id' => 'nullable|exists:task_categories,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'priority' => 'nullable|in:nizak,srednji,visok',
-            'status' => 'nullable|in:započet,u toku,završen',
+            'priority' => 'nullable|in:low,medium,high,emergency',
+            'status' => 'nullable|in:started,in progress,finished',
             'deadline' => 'nullable|date',
             'estimated_hours' => 'nullable|integer|min:1'
         ]);
@@ -90,8 +90,8 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'priority' => 'nullable|in:nizak,srednji,visok',
-            'status' => 'nullable|in:započet,u toku,završen',
+            'priority' => 'nullable|in:low,medium,high,emergency',
+            'status' => 'nullable|in:started,in progress,finished',
             'deadline' => 'nullable|date',
             'estimated_hours' => 'nullable|integer|min:1'
         ]);
@@ -169,32 +169,68 @@ class TaskController extends Controller
     // SEARCH TASKOVA (uvek filtrira po useru!)
     // -----------------------------------------------------
     public function search(Request $request)
-    {
-        $query = Task::query();
+{
+    $query = Task::query();
 
-        $query->whereHas('taskList', fn($q) => $q->where('user_id', Auth::id()));
+    // 1. Obavezan uslov za korisnika (uvek ide uz ostale)
+    $query->whereHas('taskList', fn($q) => $q->where('user_id', Auth::id()));
 
-        if ($search = $request->query('query')) {
-            $queryLower = strtolower($search);
-            $query->whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
-                  ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"]);
-        }
-
-        if ($priority = $request->query('priority')) {
-            $query->where('priority', $priority);
-        }
-
-        $sortBy = $request->query('sort_by', 'created_at');
-        $direction = $request->query('direction', 'desc');
-
-        $tasks = $query->orderBy($sortBy, $direction)->paginate(5);
-
-        if ($tasks->isEmpty()) {
-            return response()->json(['message' => 'Nema zadataka koji odgovaraju pretrazi.']);
-        }
-
-        return TaskResource::collection($tasks);
+    // 2. Grupisanje pretrage (da OR ne "pobegne" van user_id uslova)
+    if ($search = $request->query('query')) {
+        $queryLower = strtolower($search);
+        $query->where(function($q) use ($queryLower) {
+            $q->whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
+              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"]);
+        });
     }
+
+    // 3. Filteri
+    if ($priority = $request->query('priority')) {
+        $query->where('priority', $priority);
+    }
+    
+    if ($status = $request->query('status')) {
+       $query->where('status', $status);
+    }
+
+    $sortBy = $request->query('sort_by', 'created_at');
+    $direction = $request->query('direction', 'desc');
+
+    $tasks = $query->orderBy($sortBy, $direction)->paginate(5);
+
+    // 4. Uvek vraćaj kolekciju (čak i ako je prazna) zbog frontenda
+    return TaskResource::collection($tasks);
+}
+    // public function search(Request $request)
+    // {
+    //     $query = Task::query();
+
+    //     $query->whereHas('taskList', fn($q) => $q->where('user_id', Auth::id()));
+
+    //     if ($search = $request->query('query')) {
+    //         $queryLower = strtolower($search);
+    //         $query->whereRaw('LOWER(title) LIKE ?', ["%{$queryLower}%"])
+    //               ->orWhereRaw('LOWER(description) LIKE ?', ["%{$queryLower}%"]);
+    //     }
+
+    //     if ($priority = $request->query('priority')) {
+    //         $query->where('priority', $priority);
+    //     }
+    //     if ($status = $request->query('status')) {
+    //        $query->where('status', $status);
+    //      }
+
+    //     $sortBy = $request->query('sort_by', 'created_at');
+    //     $direction = $request->query('direction', 'desc');
+
+    //     $tasks = $query->orderBy($sortBy, $direction)->paginate(5);
+
+    //     if ($tasks->isEmpty()) {
+    //         return response()->json(['message' => 'There`s no tasks fullfiling the conditions.']);
+    //     }
+
+    //     return TaskResource::collection($tasks);
+    // }
 
     // -----------------------------------------------------
     // EXPORT CSV — samo userovi taskovi

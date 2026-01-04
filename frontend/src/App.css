@@ -496,10 +496,9 @@ html, body, #root {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  background: #1a1a1a;
+  background: transparent;
   padding: 8px 15px;
-  border-radius: 12px;
-  border: 1px solid #333;
+  
 }
 
 .filter-select {

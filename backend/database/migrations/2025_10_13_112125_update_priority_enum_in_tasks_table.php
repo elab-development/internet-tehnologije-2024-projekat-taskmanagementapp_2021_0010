@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-         $table->enum('priority', ['nizak', 'srednji', 'visok', 'hitno'])->default('srednji')->change();
+         $table->enum('priority', ['low', 'medium', 'high', 'emergency'])->default('medium')->change();
         });
     }
 

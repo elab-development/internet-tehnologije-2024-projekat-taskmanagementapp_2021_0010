@@ -63,8 +63,8 @@ public function stats()
     return response()->json([
         'totalTasks' => Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))->count(),
         'totalLists' => TaskList::where('user_id', $userId)->count(),
-        'completed' => Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))->where('status', 'završen')->count(),
-        'emergency' => Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))->where('priority', 'hitno')->count(),
+        'completed' => Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))->where('status', 'finished')->count(),
+        'emergency' => Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))->where('priority', 'emergency')->count(),
         'tasksByCategory' => $tasksByCategory,
         'tasksByStatus' => $tasksByStatus,
         'tasksByPriority' => $tasksByPriority,
@@ -86,7 +86,7 @@ public function tasksInProgress()
     $tasks = Task::whereHas('taskList', fn($q) =>
         $q->where('user_id', $userId)
     )
-    ->where('status', 'u toku')
+    ->where('status', 'in progress')
     ->orderBy('deadline', 'asc')
     ->paginate(5);
 
@@ -100,7 +100,7 @@ public function holidaysAndTasks()
 
     // 1. Poziv javnog REST servisa ,HTTP GET zahtev ka javnom REST servisu koji vraća praznike za Srbiju 2025.
     try {
-        $response = Http::timeout(5)->get('https://date.nager.at/api/v3/PublicHolidays/2025/RS');
+        $response = Http::timeout(5)->get('https://date.nager.at/api/v3/PublicHolidays/2026/RS');
         $holidays = $response->json(); // JSON niz praznika
     } catch (\Exception $e) {
         $holidays = [];

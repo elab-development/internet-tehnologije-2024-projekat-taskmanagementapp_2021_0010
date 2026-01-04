@@ -12,7 +12,7 @@ return new class extends Migration {
         DB::statement("
             ALTER TABLE tasks 
             ADD CONSTRAINT chk_tasks_priority
-            CHECK (priority IN ('nizak', 'srednji', 'visok', 'hitno'))
+            CHECK (priority IN ('low', 'medium', 'high', 'emergency'))
         ");
     }
 
