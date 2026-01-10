@@ -22,7 +22,6 @@ class TaskResource extends JsonResource
         'status' => $this->status,
         'deadline' => $this->deadline,
         'estimated_hours' => $this->estimated_hours,
-        // ✅ Dodaj direktne ID-eve
         'category_id' => $this->category_id,
         'task_list_id' => $this->task_list_id,
         'category' => new TaskCategoryResource($this->whenLoaded('category')),

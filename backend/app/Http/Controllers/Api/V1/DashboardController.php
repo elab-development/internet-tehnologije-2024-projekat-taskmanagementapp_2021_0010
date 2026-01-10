@@ -108,6 +108,9 @@ public function holidaysAndTasks()
 
     // 2. Dohvati zadatke koji imaju deadline na praznik
     $tasksOnHolidays = Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))
+    //Uzmi samo taskove čiji je deadline JEDAN OD datuma praznika
+    //collect($holidays) → pretvara niz u Laravel kolekciju
+    //toArray() → pretvara u običan PHP niz
         ->whereIn('deadline', collect($holidays)->pluck('date')->toArray())
         ->get(['title', 'deadline', 'priority']);
 
@@ -118,42 +121,5 @@ public function holidaysAndTasks()
     ]);
 }
 
-
-
-
-
-//     public function stats()
-//     {
-
-//          // Poziv ZenQuotes API-ja, šalje GET zahtev ka URL-u.
-//         try {
-//           $response = Http::timeout(5)->get('https://zenquotes.io/api/random');
-//           $quoteData = $response->json()[0];
-//             } catch (\Exception $e) {
-//          $quoteData = ['q' => 'Stay motivated!', 'a' => 'System'];
-// }
-
-
-//         return response()->json([
-//             'totalTasks' => Task::count(),
-//             'totalLists' => TaskList::count(),
-//             'completed' => Task::where('status', 'završen')->count(),
-//             'emergency' => Task::where('priority', 'hitno')->count(),
-//             //Ubaci i na frontu
-//             'motivation' => [
-//                 'quote' => $quoteData['q'],
-//                 'author' => $quoteData['a']
-//             ]
-//         ]);
-//     }
-
-//    public function tasksInProgress()
-// {
-//     $tasks = Task::where('status', 'u toku')
-//             ->orderBy('deadline', 'asc')
-//             ->paginate(5); 
-
-//         return response()->json($tasks);
-// }
 
 }

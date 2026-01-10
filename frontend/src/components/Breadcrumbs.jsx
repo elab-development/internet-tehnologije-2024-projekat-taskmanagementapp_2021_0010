@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import "../App.css";
 
-//Breadcrumbs (Hlebne mrvice),  automatski generiše navigacionu stazu na osnovu trenutnog URL-a aplikacije
+//Breadcrumbs ,  automatski generiše navigacionu stazu na osnovu trenutnog URL-a aplikacije
 export default function Breadcrumbs() {
   //vraca trenutnu lokaciju tj putanju
   const location = useLocation();
@@ -17,7 +17,7 @@ export default function Breadcrumbs() {
       {/* Prvi link u navigaciji je uvek fiksni link "Home" */}
       <Link to="/" className="breadcrumb-link">Home</Link>
       {paths.map((segment, index) => {
-        //kreiranje akumulativne rute- Napravi podniz od početka do trenutnog segmenta (slice)
+        //route → akumulativni URL do tog segmenta.
         const route = "/" + paths.slice(0, index + 1).join("/");
                                                            //Uzima podstring počevši od indeksa 1 pa sve do kraja.
         const formatted = segment.charAt(0).toUpperCase() + segment.slice(1);

@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    // GET /api/v1/users
+    // GET /api/v1/user
     public function index()
     {
         $users = User::with('taskLists')->paginate(4);
         return UserResource::collection($users);
     }
 
-    // POST /api/v1/users
+    // POST /api/v1/user
     public function store(Request $request)
     {
        $validated = $request->validate([
@@ -29,7 +29,6 @@ class UserController extends Controller
             'role' => 'in:admin,user,guest',
         ]);
 
-    //    $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
 
         return new UserResource($user);
@@ -50,17 +49,13 @@ class UserController extends Controller
         if (!$user) return response()->json(['error' => 'User not found'], 404);
 
         $validated = $request->validate([
+            //sometimes kaže Laravelu: "Proveri ovo polje samo ako se ono zapravo nalazi u zahtevu".
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $id,
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:6',
             'role' => 'in:admin,user,guest',
         ]);
-
-        //automatski hesira 
-        // if (isset($validated['password'])) {
-        //     $validated['password'] = Hash::make($validated['password']);
-        // }
 
         $user->update($validated);
 
@@ -82,6 +77,7 @@ class UserController extends Controller
  //==================================================================================================
  public function showMe()
 {
+    //omogućava brz pristup objektu korisnika koji trenutno šalje zahtev.
         $user = Auth::user(); 
     return new UserResource($user);
 }

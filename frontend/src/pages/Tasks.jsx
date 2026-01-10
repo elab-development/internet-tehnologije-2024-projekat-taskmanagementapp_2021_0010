@@ -5,90 +5,76 @@ import ItemCard from "../components/ItemCard";
 import ModalForm from "../components/ModalForm";
 import { useSearchParams } from "react-router-dom";
 import "../App.css";
+import usePaginatedFetch from "../hooks/usePaginatedFetch";
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState([]);
+  //const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState("all");
   const [priority, setPriority] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState(null);                                                        
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [lastPage, setLastPage] = useState(1);
   const [searchParams] = useSearchParams();
   const [lists, setLists] = useState([]);
-   const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const {
+  data: tasks,
+  currentPage,
+  lastPage,
+  fetchData,
+} = usePaginatedFetch();
 
   //Pokušava da izvuče vrednost pridruženu ključu list_id iz trenutnog URL-a.
   const listId = searchParams.get("list_id");
 
-  // --- Učitavanje zadataka sa filtriranjem i paginacijom ---
-  //Funkcija prihvata opcioni argument page. Ako nije prosleđen, podrazumevana vrednost je 1.
-//   const fetchTasks = (page = 1) => {
-//     const url = listId ? `/task-lists/${listId}` : `/tasks?page=${page}`;
-//     api.get(url)
-//       .then((res) => {
-//         let data = listId ? res.data.data.tasks : res.data.data;
-//         //normalizacija- sigurava da je data uvek niz, čak i ako API greškom vrati samo jedan objekat umesto niza bitno zbog mapiranja i filtriranja
-//         if (!Array.isArray(data)) data = [data];
-
-//         // Filtriranje po statusu i prioritetu
-//         let filtered = data;
-//         if (status !== "all") {
-//           filtered = filtered.filter(
-//             (task) =>
-//               task.status &&
-//               task.status.toLowerCase() === status.toLowerCase()
-//           );
-//         }
-//         if (priority !== "all") {
-//           filtered = filtered.filter(
-//             (task) =>
-//               task.priority &&
-//               task.priority.toLowerCase() === priority.toLowerCase()
-//           );
-//         }
-
-//         setTasks(filtered);
-
-// //Azuriranje paginacije  ako je API u odgovoru poslao objekat meta,p, koji se dodaju kod paginacije koji sadrži current_page i last_page.
-//         if (!listId && res.data.meta) {
-//           setCurrentPage(res.data.meta.current_page);
-//           setLastPage(res.data.meta.last_page);
-//         }
-//       })
-//       .catch((err) => console.error("Error occured during loading data:", err));
-//   };
-
+  
 // --- Učitavanje zadataka preko Search rute (Backend filtriranje) ---
-  const fetchTasks = (page = 1) => {
-    // Ako imamo list_id, vučemo iz te liste, inače koristimo search rutu za sve
-    let url = listId 
-      ? `/task-lists/${listId}?page=${page}` 
-      : `/tasks/search?page=${page}`;
+  // const fetchTasks = (page = 1) => {
+  //   // Ako imamo list_id, vučemo iz te liste, inače koristimo search rutu za sve
+  //   let url = listId 
+  //     ? `/task-lists/${listId}?page=${page}` 
+  //     : `/tasks/search?page=${page}`;
 
-    // Dodajemo filtere samo ako nije "all" i ako nismo unutar specifične liste 
-    // (Možeš dodati filtere i za listId ako backend to podržava)
-    if (!listId) {
-      if (status !== "all") url += `&status=${status}`;
-      if (priority !== "all") url += `&priority=${priority}`;
-    }
+  //   // Dodajemo filtere samo ako nije "all" i ako nismo unutar specifične liste 
+  //   // (Možeš dodati filtere i za listId ako backend to podržava)
+  //   if (!listId) {
+  //     if (status !== "all") url += `&status=${status}`;
+  //     if (priority !== "all") url += `&priority=${priority}`;
+  //   }
 
-    api.get(url)
-      .then((res) => {
-        // Laravel Resource vraća podatke u res.data.data
-        let incomingData = listId ? res.data.data.tasks : res.data.data;
+  //   api.get(url)
+  //     .then((res) => {
+  //       // Laravel Resource vraća podatke u res.data.data
+  //       let incomingData = listId ? res.data.data.tasks : res.data.data;
         
-        // Sigurnosna provera za niz
-        setTasks(Array.isArray(incomingData) ? incomingData : []);
+  //       // Sigurnosna provera za niz
+  //       setTasks(Array.isArray(incomingData) ? incomingData : []);
 
-        // Ažuriranje paginacije iz meta podataka (Laravel pagination)
-        if (res.data.meta) {
-          setCurrentPage(res.data.meta.current_page);
-          setLastPage(res.data.meta.last_page);
-        }
-      })
-      .catch((err) => console.error("Error loading data:", err));
-  };
+  //       // Ažuriranje paginacije iz meta podataka (Laravel pagination)
+  //       if (res.data.meta) {
+  //         setCurrentPage(res.data.meta.current_page);
+  //         setLastPage(res.data.meta.last_page);
+  //       }
+  //     })
+  //     .catch((err) => console.error("Error loading data:", err));
+  // };
+
+
+  const fetchTasks = (page = 1) => {
+  let url = listId
+    ? `/task-lists/${listId}`
+    : `/tasks/search`;
+
+  if (!listId) {
+    if (status !== "all") url += `?status=${status}`;
+    if (priority !== "all") url += `${url.includes("?") ? "&" : "?"}priority=${priority}`;
+  }
+
+  fetchData(url, page, (res) =>
+    listId ? res.data.data.tasks : res.data.data
+  );
+};
 
 // Okidač za učitavanje kada se promeni stranica, filter ili lista
   useEffect(() => {
@@ -187,7 +173,9 @@ const handleExport = async () => {
     link.href = url;
     //Atribut download govori pretraživaču da, kada se link klikne, sačuva sadržaj sa imenom "tasks_export.csv"
     link.setAttribute("download", "tasks_export.csv");
+    //dodavanje u dom-programatski ubacujemo <a> tag u stranicu da bi browser mogao da ga "klikne" i pokrene preuzimanje.
     document.body.appendChild(link);
+    //simuliranje klika
     link.click();
 
     // Nakon što je preuzimanje pokrenuto, važno je osloboditi memoriju i očistiti DOM.
@@ -386,6 +374,7 @@ const handleExport = async () => {
     label: list.name || list.title || `Lista ${list.id}`,
   })),
   // Dodaj defaultnu vrednost ako editujemo postojeći task
+  //?. znači “ako postoji editTask, uzmi task_list_id”.
 initialValue: editTask?.task_list_id || "",
 
 },
@@ -406,8 +395,5 @@ initialValue: editTask?.task_list_id || "",
     </div>
     
   );
-
-
-
 
 }

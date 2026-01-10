@@ -28,7 +28,8 @@ class Task extends Model
 
 public function category()
 {
-    return $this->belongsTo(TaskCategory::class, 'category_id');
+    return $this->belongsTo(TaskCategory::class);
+                                              //'category_id'
 }
 
 }

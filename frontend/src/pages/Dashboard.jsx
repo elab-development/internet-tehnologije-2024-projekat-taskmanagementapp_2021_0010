@@ -4,6 +4,7 @@ import StatCard from '../components/StatCard';
 import { List, CheckCircle, AlertTriangle, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Chart } from "react-google-charts";
+import usePaginatedFetch from "../hooks/usePaginatedFetch";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -11,33 +12,43 @@ export default function Dashboard() {
     totalLists: 0,
     completed: 0,
     emergency: 0,
-    tasksByStatus: [], // NOVO
-    tasksByCategory: [], // NOVO
-    tasksByPriority: [], // NOVO
+    tasksByStatus: [], 
+    tasksByCategory: [], 
+    tasksByPriority: [], 
   });
-  const [motivation, setMotivation] = useState({ quote: '', author: '' }); // NOVO STANJE
+  const [motivation, setMotivation] = useState({ quote: '', author: '' }); 
   const [holidaysData, setHolidaysData] = useState(null);
-  const [tasksInProgress, setTasksInProgress] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-
+  // const [tasksInProgress, setTasksInProgress] = useState([]);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [lastPage, setLastPage] = useState(1);
+const {
+  data: tasksInProgress,
+  currentPage,
+  lastPage,
+  fetchData,
+} = usePaginatedFetch();
   const navigate = useNavigate();
 
+  // const fetchTasks = (page = 1) => {
+  //   api.get(`/tasks-in-progress?page=${page}`)
+  //     .then((res) => {
+  //       setTasksInProgress(res.data.data);
+  //       setCurrentPage(res.data.current_page);
+  //       setLastPage(res.data.last_page);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
   const fetchTasks = (page = 1) => {
-    api.get(`/tasks-in-progress?page=${page}`)
-      .then((res) => {
-        setTasksInProgress(res.data.data);
-        setCurrentPage(res.data.current_page);
-        setLastPage(res.data.last_page);
-      })
-      .catch((err) => console.error(err));
-  };
+  fetchData("/tasks-in-progress", page);
+};
 
+
+  //inicijalno ucitavanje podataka
   useEffect(() => {
     api.get('/dashboard-stats')
       .then((res) => {
       setStats(res.data);
-      setMotivation(res.data.motivation); // IZVLAČENJE CITATA
+      setMotivation(res.data.motivation); 
     })
       .catch((err) => console.error(err));
 
@@ -47,7 +58,8 @@ export default function Dashboard() {
     .catch((err) => console.error(err));
   }, []);
 
-//API vraća podatke kao niz objekata. Za Google Charts potreban je niz nizova (Array of Arrays).
+//funkcija koja služi za pripremu podataka za grafikon
+                                 //konkretni naziv kategorije
   function formatChartData(data, key, label) {
   if (!data || data.length === 0) return [[label, "Total"], ["No data", 0]];
 
@@ -55,15 +67,21 @@ export default function Dashboard() {
     [label, "Total"],
     ...data.map(item => [
       item[key] ?? "Unknown",  // Fallback ako je null
+      //konvertuje total u broj, a ako nije moguće (null, undefined), koristi 0
       Number(item.total) || 0
     ])
   ];
 }
+//[
+//  ["Status", "Total"],        // zaglavlje
+  //["In Progress", 5],
+ // ["Done", 3],
+  //["Unknown", 2]              // fallback jer je status null
+//]
 
 
   return (
     <div className="dashboard">
-
       <div className="dashboard-header">
         <div>
           <h1>Dashboard</h1>
@@ -133,10 +151,13 @@ export default function Dashboard() {
         )}
 
         {/* Dugme za prikaz svih praznika */}
+        {/* <details> → HTML element koji može sakriti ili prikazati sadržaj */}
         <details style={{ marginTop: '15px' }}>
+          {/* <summary> → tekst koji je uvek vidljiv i na koji korisnik klikom otvara/zatvara <details> */}
             <summary style={{ color: '#ffb3d9', cursor: 'pointer' }}>
                 View Full List of 2025 Holidays ({holidaysData.holidays.length})
             </summary>
+              {/* listStyleType: 'disc' → bullet points */}
             <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '10px' }}>
                 {holidaysData.holidays.map((holiday, index) => (
                     <li key={index} style={{ color: '#999' }}>
@@ -157,6 +178,7 @@ export default function Dashboard() {
     <h3>Tasks by Status</h3>
     <Chart
       chartType="PieChart"
+      //"status" → polje po kojem se grupišu zadaci
       data={formatChartData(stats.tasksByStatus, "status", "Status")}
       width={"100%"}
       height={"100%"}
@@ -176,6 +198,7 @@ export default function Dashboard() {
     <Chart
       chartType="ColumnChart"
       data={formatChartData(stats.tasksByPriority, "priority", "Priority")}
+      //width i height → grafikon zauzima ceo kontejner
       width={"100%"}
       height={"100%"}
       options={{
@@ -225,7 +248,8 @@ export default function Dashboard() {
               <div key={task.id} className="task-item">
                 <div className="task-title">{task.title}</div>
                 <div className="task-meta">
-                  <span className={`task-priority ${task.priority === 'hitno' ? 'high' : ''}`}>
+                  {/* <span> → inline element koji koristimo da stilizujemo tekst */}
+                  <span className={`task-priority ${task.priority === 'emergency' ? 'emergency' : ''}`}>
                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                   </span>
                   <span className="task-deadline">Deadline: {task.deadline}</span>
@@ -246,7 +270,9 @@ export default function Dashboard() {
           >
             ←
           </button>
-
+           {/* Array(lastPage) → pravi prazan niz dužine lastPage ,koristi spread operator da dobije niz koji možemo map-ovati*/}
+          {/* Rezultat: [undefined, undefined, undefined, undefined, undefined] */}
+          {/* _ → ignorisani element (nije bitan, jer je niz samo "prazan") */}
           {[...Array(lastPage)].map((_, i) => (
             <button
               key={i}

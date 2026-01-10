@@ -12,8 +12,8 @@ export default function Logout() {
 
       //  Ako korisnik nije ulogovan — odmah ga vrati na login
       if (!token) {
-        alert("Niste prijavljeni!");
-        console.warn("Nema tokena — preusmeravam na login.");
+        alert("You are not logged!");
+        console.warn("Theres no token- back to login");
         navigate("/login");
         return;
       }
@@ -24,16 +24,16 @@ export default function Logout() {
         console.log("Logout uspešan");
       } catch (err) {
         if (err.response?.status === 401) {
-          console.warn("Nalog nije autentifikovan — redirect na login.");
+          console.warn("Account not autentificated.");
         } else {
-          console.error("Greška pri odjavi:", err);
+          console.error("Error", err);
         }
       }
 
       // U svakom slučaju obriši token i vrati ga na login
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-
+//navigate("/login") menja samo stanje pretraživača / URL, ali ne menja samu funkciju navigate.
       navigate("/login");
     };
 

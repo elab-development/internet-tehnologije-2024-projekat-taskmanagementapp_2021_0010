@@ -22,7 +22,6 @@ return new class extends Migration
     $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
     $table->enum('status', ['started', 'in progress', 'finished'])->default('started');
     $table->date('deadline')->nullable();
-   // $table->integer('estimated_hours')->nullable();
     $table->timestamps();
         });
     }

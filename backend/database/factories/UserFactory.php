@@ -23,7 +23,7 @@ class UserFactory extends Factory
     {
         return [
         'name' => $this->faker->name(),
-        //safe email- To su adrese koje ne mogu stvarno poslati poštu nikome, pa su potpuno sigurne za test podatke, baze i seed-ove.
+        //safeEmail() služi da ti generiše email adresu koja garantovano ne postoji u stvarnom svetu.
         'email' => $this->faker->unique()->safeEmail(),
         'phone' => $this->faker->phoneNumber(),
         //laravel hešira automatski zbog 'hashed' cast-a

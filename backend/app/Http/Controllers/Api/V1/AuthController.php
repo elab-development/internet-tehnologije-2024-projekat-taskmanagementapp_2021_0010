@@ -17,6 +17,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
                                         //ora biti jedinstveno u koloni email tabele users.
             'email' => 'required|string|email|unique:users,email',
+            //confirm-To znači da frontend mora poslati dva polja: password i password_confirmation
             'password' => 'required|string|confirmed',
              'phone' => 'nullable|string|max:20',
              'role' => 'nullable|in:user,guest'

@@ -18,33 +18,25 @@ class TaskListController extends Controller
             ->paginate(3);
 
         return TaskListResource::collection($lists);
-        // $taskLists = TaskList::with(['user', 'tasks'])->paginate(3);
-        // return TaskListResource::collection($taskLists);
+      
     }
 
  public function store(Request $request)
     {
-         $user = Auth::user();
+        $user = Auth::user();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'is_favorite' => 'boolean'
         ]);
 
-        $validated['user_id'] = $user->id; // automatski vezano za usera
+        //// Laravel sam uzima ID ulogovanog korisnika i kreira listu kroz relaciju
+        $validated['user_id'] = $user->id; 
 
         $list = TaskList::create($validated);
 
         return new TaskListResource($list);
-        // $validated = $request->validate([
-        //     'user_id' => 'required|exists:users,id',
-        //     'name' => 'required|string|max:255',
-        //     'description' => 'nullable|string',
-        //     'is_favorite' => 'boolean'
-        // ]);
-
-        // $list = TaskList::create($validated);
-        // return new TaskListResource($list);
+        
     }
 
     public function show($id)
@@ -59,9 +51,7 @@ class TaskListController extends Controller
         }
 
         return new TaskListResource($list);
-    //     $list = TaskList::with(['user', 'tasks'])->find($id);
-    //     if (!$list) return response()->json(['error' => 'Task list not found'], 404);
-    //     return new TaskListResource($list);
+    
     }
 
     public function update(Request $request, $id)
@@ -82,16 +72,7 @@ class TaskListController extends Controller
         $list->update($validated);
 
         return new TaskListResource($list);
-        // $list = TaskList::find($id);
-        // if (!$list) return response()->json(['error' => 'Task list not found'], 404);
-        // $validated = $request->validate([
-        //     //sometimes-"Validiraj ovo polje samo ako postoji u zahtevu
-        //     'name' => 'sometimes|string|max:255',
-        //     'description' => 'nullable|string',
-        //     'is_favorite' => 'boolean'
-        // ]);
-        // $list->update($validated);
-        // return new TaskListResource($list);
+      
     }
 
     public function destroy($id)
@@ -106,10 +87,7 @@ class TaskListController extends Controller
         $list->delete();
 
         return response()->json(['message' => 'Task list deleted']);
-    //     $list = TaskList::find($id);
-    //     if (!$list) return response()->json(['error' => 'Task list not found'], 404);
-    //     $list->delete();
-    //     return response()->json(['message' => 'Task list deleted']);
+ 
     }
 
 

@@ -3,24 +3,38 @@ import api from "../api/axios";
 import ItemCard from "../components/ItemCard";
 import ModalForm from "../components/ModalForm";
 import { useNavigate } from "react-router-dom";
+import usePaginatedFetch from "../hooks/usePaginatedFetch";
 
 export default function Lists() {
-  const [lists, setLists] = useState([]);
+  // const [lists, setLists] = useState([]);
+  //showModal → da li je modal za kreiranje/izmenu liste otvoren
   const [showModal, setShowModal] = useState(false);
+  //editList → koja lista se trenutno edit-uje (ili null ako je nova)
   const [editList, setEditList] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [lastPage, setLastPage] = useState(1);
+
+  const {
+  data: lists,
+  currentPage,
+  lastPage,
+  fetchData,
+} = usePaginatedFetch();
   const navigate = useNavigate();
 
+  // const fetchLists = (page = 1) => {
+  //   api.get(`/task-lists?page=${page}`)
+  //     .then((res) => {
+  //       setLists(res.data.data);
+  //       setCurrentPage(res.data.meta.current_page);
+  //       setLastPage(res.data.meta.last_page);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
   const fetchLists = (page = 1) => {
-    api.get(`/task-lists?page=${page}`)
-      .then((res) => {
-        setLists(res.data.data);
-        setCurrentPage(res.data.meta.current_page);
-        setLastPage(res.data.meta.last_page);
-      })
-      .catch((err) => console.error(err));
-  };
+  fetchData("/task-lists", page);
+};
+
 
   useEffect(() => {
     fetchLists();
@@ -30,15 +44,18 @@ export default function Lists() {
   // Ako korisnik nije prijavljen (nema token)
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("Morate biti prijavljeni da biste dodavali ili menjali liste!");
+    alert("You have to be logged in!");
     return; // prekini funkciju odmah
   }
 
-  const req = editList
-    ? api.put(`/task-lists/${editList.id}`, data)
-    : api.post(`/task-lists`, { ...data, user_id: 1 }); 
+  const req = editList ? 
+  api.put(`/task-lists/${editList.id}`, data)
+  : api.post(`/task-lists`, data);
 
-  req
+
+//req je Promise koji se izvršava kad backend odgovori
+  req       //ako je zahtev uspešan
+//Ovo se izvršava kad backend vrati 2xx status (npr. 200, 201).
     .then(() => {
       fetchLists();
       setShowModal(false);
@@ -88,6 +105,7 @@ const handleDelete = async (id) => {
             <ItemCard
               key={list.id}
               title={list.name}
+              //${...} unutar backtick-ova ( ` ``) omogućava ubacivanje promenljive ili izraza u string
               subtitle={`${list.tasks.length} tasks`}
               description={list.description}
               onEdit={() => { setEditList(list); setShowModal(true); }}

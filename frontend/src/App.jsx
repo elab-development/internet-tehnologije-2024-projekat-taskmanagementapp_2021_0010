@@ -16,12 +16,17 @@ import "./App.css";
 function App() {
   return (
     <Router>
+{/* <Router> je postavljen oko <AppContent /> zato što komponente unutar <AppContent /> koriste rutiranje (Route, Link, useNavigate…), pa moraju biti unutar Router konteksta. */}
+{/* ❌ <Routes> ne bi radio
+❌ useNavigate() bi bacio grešku
+❌ <Link> ne bi znao gde vodi */}
       <AppContent />
     </Router>
   );
 }
 
 function AppContent() {
+  //čitanje trenutne lokacije (URL-a)
   const location = useLocation();
 // NOVO: Stanje za profil modal
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -31,7 +36,7 @@ function AppContent() {
   const handleOpenProfile = () => {
   api.get("/user")
     .then((res) => {
-      // We set the user data and ensure password starts as an empty string
+      // uzima sve podatke korisnika dodaje / prepisuje polje password praznim stringom
       setUserData({ ...res.data.data, password: "" });
       setShowProfileModal(true);
     })
@@ -39,6 +44,8 @@ function AppContent() {
 };
 
 const handleUpdateProfile = (data) => {
+  //Pravimo kopiju podataka(ne diramo originalni state / form data)
+  //payload su podaci koji idu u body HTTP zahteva.
   const payload = { ...data };
 
   // If password is empty, remove it so the backend doesn't try to update it
@@ -57,29 +64,22 @@ const handleUpdateProfile = (data) => {
         alert("Please check your input (e.g., email might be taken).");
       } else {
         console.error("Server Error:", err);
-        alert("A server error occurred (500). Please check backend logs.");
+        alert("A server error occurred (500).");
       }
     });
 };
 
   // Sidebar prikazujemo samo na glavnim stranicama
-  const showSidebar =
-    location.pathname === "/" ||
-    location.pathname === "/tasks" ||
-    location.pathname === "/lists";
+  const showSidebar = location.pathname === "/" || location.pathname === "/tasks" || location.pathname === "/lists";
 
-  // Hide UI za login/register/logout
+  // Hide UI za login/register/logout-Deklarišemo promenljivu koja će biti true ili false
+                                                  //Proverava da li se trenutni URL path nalazi u tom nizu.
   const hideUI = ["/login", "/register", "/logout"].includes(location.pathname);
 
   return (
-    <div
-      className="app-container"
-      style={{
-        backgroundColor: "#000", // da ne ostane crn ekran bez sadržaja
-        minHeight: "100vh",
-      }}
-    >
-      {/* {showSidebar && <Sidebar />} */}
+    //<div> je glavni kontejner u kojem se nalazi ceo vizuelni sadržaj aplikacije.
+    <div  className="app-container" style={{  backgroundColor: "#000", // da ne ostane crn ekran bez sadržaja  minHeight: "100vh",
+}}   >
 {/* Ako se prikazuje Sidebar, samo tada omogućavamo i Profile Modal */}
       {showSidebar && (
         <>
@@ -87,8 +87,7 @@ const handleUpdateProfile = (data) => {
           
           {/* Modal je ovde 'vezan' za postojanje Sidebara */}
           {showProfileModal && (
-  <ModalForm
-    title="My Account"
+  <ModalForm title="My Account"
     fields={[
       { name: "name", label: "Name", type: "text" },
       { name: "email", label: "Email", type: "email" },
@@ -96,7 +95,6 @@ const handleUpdateProfile = (data) => {
       { name: "password", label: "Change Password", type: "password" },
     ]}
     initialData={userData}
-    /* OVDE JE BILA GREŠKA: Prosledi handleUpdateProfile direktno */
     onSubmit={handleUpdateProfile} 
     onClose={() => setShowProfileModal(false)}
   />

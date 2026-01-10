@@ -58,6 +58,7 @@ export default function ModalForm({
                         </option>
                       );
                     }
+                    //Taj return u map() je moment kada za svaki element iz niza pravimo JSX <option> i ubacujemo ga u <select> listu.
                     return (
                       <option key={opt} value={opt}>
                         {opt}
