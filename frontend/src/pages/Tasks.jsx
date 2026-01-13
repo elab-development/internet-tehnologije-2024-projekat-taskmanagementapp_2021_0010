@@ -35,9 +35,7 @@ export default function Tasks() {
     if (priority !== "all") url += `${url.includes("?") ? "&" : "?"}priority=${priority}`;
   }
 
-  fetchData(url, page, (res) =>
-    listId ? res.data.data.tasks : res.data.data
-  );
+  fetchData(url, page, (res) => res.data.data);
 };
 
 // Okidač za učitavanje kada se promeni stranica, filter ili lista
