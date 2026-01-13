@@ -20,7 +20,6 @@ class AuthController extends Controller
             //confirm-To znači da frontend mora poslati dva polja: password i password_confirmation
             'password' => 'required|string|confirmed',
              'phone' => 'nullable|string|max:20',
-             'role' => 'nullable|in:user,guest'
         ]);
 
         $user = User::create([
@@ -28,12 +27,12 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => $validated['password'],
             'phone' => $validated['phone'] ?? null, 
-            'role' => $validated['role'] ?? 'user',
+             'role' => 'user',
+
         ]);
 
         //Ova linija koristi Laravel Sanctum za kreiranje novog API tokena za novokreiranog korisnika.
         $token = $user->createToken('auth_token')->plainTextToken;
-        //Vraća JSON odgovor klijentu
         return response()->json([
             'user' => $user,
             'token' => $token,
@@ -58,10 +57,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // return response()->json([
-        //     'message' => 'Succesfully logined',
-        //     'token' => $token,
-        // ]);
+       
         return response()->json([
         'message' => 'Succesfully logined',
         'token' => $token,

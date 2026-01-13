@@ -14,18 +14,16 @@ export default function Login() {
     setError("");
 
     try {
-
-
     // Šalje POST zahtev na endpoint /login na API serveru, prosleđujući unete vrednosti email i password kao telo zahteva. await čeka odgovor servera.
       const res = await axios.post("/login", { email, password });
-        const user = res.data.user;
+      const user = res.data.user;
 
       // Čuvanje Podataka (Ako je uspešno):
       localStorage.setItem("token", res.data.token);
+      //da bi lakse dosli do podataka usera bez ponovnog slanja zahteva
+      //React stanje (useState, context) se briše kad se stranica osveži.
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // 4️⃣ redirekcija na dashboard
-     // navigate("/");
      if (user.role === "admin") {
        navigate("/admin/dashboard");
         } else {

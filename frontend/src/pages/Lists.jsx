@@ -6,14 +6,10 @@ import { useNavigate } from "react-router-dom";
 import usePaginatedFetch from "../hooks/usePaginatedFetch";
 
 export default function Lists() {
-  // const [lists, setLists] = useState([]);
   //showModal → da li je modal za kreiranje/izmenu liste otvoren
   const [showModal, setShowModal] = useState(false);
   //editList → koja lista se trenutno edit-uje (ili null ako je nova)
   const [editList, setEditList] = useState(null);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [lastPage, setLastPage] = useState(1);
-
   const {
   data: lists,
   currentPage,
@@ -22,19 +18,9 @@ export default function Lists() {
 } = usePaginatedFetch();
   const navigate = useNavigate();
 
-  // const fetchLists = (page = 1) => {
-  //   api.get(`/task-lists?page=${page}`)
-  //     .then((res) => {
-  //       setLists(res.data.data);
-  //       setCurrentPage(res.data.meta.current_page);
-  //       setLastPage(res.data.meta.last_page);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
   const fetchLists = (page = 1) => {
   fetchData("/task-lists", page);
 };
-
 
   useEffect(() => {
     fetchLists();
@@ -62,7 +48,6 @@ export default function Lists() {
       setEditList(null);
     })
     .catch((err) => {
-      // ako backend ipak vrati 401 (npr. token istekao)
       if (err.response?.status === 401) {
         alert("You have to be logged in!");
         localStorage.removeItem("token");

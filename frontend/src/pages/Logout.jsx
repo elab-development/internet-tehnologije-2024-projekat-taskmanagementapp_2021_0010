@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
+//Implementirano kao stranica jer ima svoj URL,logiku
 export default function Logout() {
   const navigate = useNavigate();
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Menu, X, User, LogOut } from "lucide-react";//Uvozi dve ikone iz popularne biblioteke ikona Lucide:
 //Menu: Ikona za hamburger meni (prikazuje se kada je bočna traka zatvorena).
 //X: Ikona za zatvaranje (prikazuje se kada je bočna traka otvorena).
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom"; 
 
 export default function Sidebar({ onMyAccountClick }) {
   
@@ -15,7 +15,7 @@ export default function Sidebar({ onMyAccountClick }) {
       </button>
 
       {/* Bočna Traka */}
-      <aside className={`sidebar ${open ? "open" : ""}`}>
+      <aside className={`sidebar${open ? "open" : ""}`}>
         <h2 className="sidebar-title">Task Manager</h2>
         <nav className="sidebar-links">
           {/* end je neophodan da bi se osiguralo da se ovaj link aktivira samo kada je ruta tačno /, */}
@@ -34,6 +34,7 @@ export default function Sidebar({ onMyAccountClick }) {
               onMyAccountClick(); // Otvori modal iz App.jsx
             }}
           >
+            {/* ikonica */}
             <User size={18} /> My Account
           </a>
     <NavLink to="/logout" onClick={() => setOpen(false)}>

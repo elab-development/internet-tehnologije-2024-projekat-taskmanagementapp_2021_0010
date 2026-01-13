@@ -15,9 +15,13 @@ Route::prefix('v1')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']);
+    });
     Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
         Route::get('tasks/search', [TaskController::class, 'search']);
         Route::get('tasks/export', [TaskController::class, 'export']);
+        Route::get('tasks/due-soon', [TaskController::class, 'dueSoon']);
         Route::get('user', [UserController::class, 'showMe']);
         Route::put('user', [UserController::class, 'updateMe']);
         Route::apiResource('tasks', TaskController::class);
@@ -27,9 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::get('tasks/priority/{priority}', [TaskController::class, 'filterByPriority']);
         
         Route::get('tasks/category/{id}', [TaskController::class, 'filterByCategory']);
-        Route::get('users/{id}/task-lists', [TaskListController::class, 'getByUser']);
+      //  Route::get('users/{id}/task-lists', [TaskListController=class, 'getByUser']);
         Route::get('task-lists/{id}/tasks', [TaskController::class, 'getByTaskList']);
-        Route::get('tasks/due-soon', [TaskController::class, 'dueSoon']);
         Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
         Route::get('/tasks-in-progress', [DashboardController::class, 'tasksInProgress']);
         Route::get('/holidays-tasks', [DashboardController::class, 'holidaysAndTasks']);

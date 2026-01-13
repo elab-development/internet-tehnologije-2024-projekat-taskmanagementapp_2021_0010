@@ -18,10 +18,7 @@ class TaskFactory extends Factory
     public function definition(): array
     { 
 
-        return [
-        // 'task_list_id' => \App\Models\TaskList::factory(),
-       //  'category_id' => \App\Models\TaskCategory::factory(),
-    
+        return [    
         'title' => $this->faker->sentence(3),
         'description' => $this->faker->paragraph(),
         'priority' => $this->faker->randomElement(['low', 'medium', 'high','emergency']),

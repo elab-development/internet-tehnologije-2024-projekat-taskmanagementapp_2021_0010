@@ -101,7 +101,10 @@ public function updateMe(Request $request)
 
     $user->update($validated);
 
-    return new UserResource($user);
+    return response()->json([
+        'message' => 'Profile updated successfully!',
+        'user' => new UserResource($user)
+    ], 200);
 }
 
 

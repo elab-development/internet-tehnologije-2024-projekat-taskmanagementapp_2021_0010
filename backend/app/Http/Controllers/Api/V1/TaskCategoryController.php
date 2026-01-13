@@ -12,9 +12,10 @@ class TaskCategoryController extends Controller
 {
     public function index()
     {
-         $categories = TaskCategory::with('tasks')->paginate(5);
-         return TaskCategoryResource::collection($categories);
+    $categories = TaskCategory::paginate(5);
+    return TaskCategoryResource::collection($categories);
     }
+
 
    public function store(Request $request)
     {

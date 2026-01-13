@@ -9,6 +9,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [password_confirmation, setPasswordConfirmation] = useState("");
   const [error, setError] = useState("");
+  const [phone, setPhone] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -26,11 +27,11 @@ export default function Register() {
   const res = await axios.post("/register", {
     name,
     email,
+    phone,
     password,
     password_confirmation,
   });
 
-  console.log(res.data);
   alert(" Registration successful!");
   navigate("/login");
     } catch (err) {
@@ -77,6 +78,16 @@ export default function Register() {
               required
             />
           </div>
+
+          <div className="input-group">
+  <input
+    type="text"
+    name="phone"
+    placeholder="Phone number (optional)"
+    value={phone}
+    onChange={(e) => setPhone(e.target.value)}
+  />
+</div>
           <div className="input-group">
             <input
               type="password"

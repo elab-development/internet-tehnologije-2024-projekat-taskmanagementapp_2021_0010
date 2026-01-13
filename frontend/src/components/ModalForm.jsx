@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function ModalForm({
   title,
-  //Definicija svih polja forme (tip, ime, labela, opcije...).
   fields,
-  //Početni podaci za popunjavanje forme. Koristi se za operaciju "Edit"
   initialData = {},
   onSubmit,
   onClose,
@@ -45,6 +43,7 @@ export default function ModalForm({
                   name={f.name}
                   //Prioritet Vrednosti (?? Operatori) 
                   //pokušava da koristi formData (trenutno stanje). Ako nije definisano, pada na initialValue definisan u fields nizu. Ako ni to ne postoji, koristi prazan string.
+                //value ovde određuje koja opcija je trenutno izabrana u <select> elementu.
                   value={ formData[f.name] ?? f.initialValue ?? ""}
                   onChange={handleChange}
                 >

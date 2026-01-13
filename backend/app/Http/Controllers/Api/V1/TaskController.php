@@ -203,7 +203,6 @@ class TaskController extends Controller
 
     $tasks = $query->orderBy($sortBy, $direction)->paginate(5);
 
-    // 4. Uvek vraćaj kolekciju (čak i ako je prazna) zbog frontenda
     return TaskResource::collection($tasks);
 }
  

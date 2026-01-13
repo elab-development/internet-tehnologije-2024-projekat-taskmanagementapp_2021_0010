@@ -18,27 +18,14 @@ export default function Dashboard() {
   });
   const [motivation, setMotivation] = useState({ quote: '', author: '' }); 
   const [holidaysData, setHolidaysData] = useState(null);
-  // const [tasksInProgress, setTasksInProgress] = useState([]);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [lastPage, setLastPage] = useState(1);
-const {
+  const {
   data: tasksInProgress,
   currentPage,
   lastPage,
   fetchData,
 } = usePaginatedFetch();
-  const navigate = useNavigate();
-
-  // const fetchTasks = (page = 1) => {
-  //   api.get(`/tasks-in-progress?page=${page}`)
-  //     .then((res) => {
-  //       setTasksInProgress(res.data.data);
-  //       setCurrentPage(res.data.current_page);
-  //       setLastPage(res.data.last_page);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
-  const fetchTasks = (page = 1) => {
+const navigate = useNavigate();
+const fetchTasks = (page = 1) => {
   fetchData("/tasks-in-progress", page);
 };
 
@@ -65,7 +52,9 @@ const {
 
   return [
     [label, "Total"],
+    //tri tacke za Spajanje zaglavlja i podataka u jedan niz
     ...data.map(item => [
+      //Ako u bazi neki zadatak slučajno nema kategoriju ili status (null), na grafikonu će se pojaviti pod nazivom "Unknown" umesto da se sve sruši.
       item[key] ?? "Unknown",  // Fallback ako je null
       //konvertuje total u broj, a ako nije moguće (null, undefined), koristi 0
       Number(item.total) || 0
@@ -155,7 +144,7 @@ const {
         <details style={{ marginTop: '15px' }}>
           {/* <summary> → tekst koji je uvek vidljiv i na koji korisnik klikom otvara/zatvara <details> */}
             <summary style={{ color: '#ffb3d9', cursor: 'pointer' }}>
-                View Full List of 2025 Holidays ({holidaysData.holidays.length})
+                View Full List of 2026 Holidays ({holidaysData.holidays.length})
             </summary>
               {/* listStyleType: 'disc' → bullet points */}
             <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '10px' }}>

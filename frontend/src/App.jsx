@@ -26,7 +26,6 @@ function App() {
 }
 
 function AppContent() {
-  //čitanje trenutne lokacije (URL-a)
   const location = useLocation();
 // NOVO: Stanje za profil modal
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -95,6 +94,7 @@ const handleUpdateProfile = (data) => {
       { name: "password", label: "Change Password", type: "password" },
     ]}
     initialData={userData}
+    //ne poziva se fja ovde
     onSubmit={handleUpdateProfile} 
     onClose={() => setShowProfileModal(false)}
   />

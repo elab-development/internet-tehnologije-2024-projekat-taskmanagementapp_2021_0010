@@ -8,13 +8,10 @@ import "../App.css";
 import usePaginatedFetch from "../hooks/usePaginatedFetch";
 
 export default function Tasks() {
-  //const [tasks, setTasks] = useState([]);
   const [status, setStatus] = useState("all");
   const [priority, setPriority] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState(null);                                                        
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [lastPage, setLastPage] = useState(1);
   const [searchParams] = useSearchParams();
   const [lists, setLists] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -28,42 +25,9 @@ export default function Tasks() {
   //Pokušava da izvuče vrednost pridruženu ključu list_id iz trenutnog URL-a.
   const listId = searchParams.get("list_id");
 
-  
-// --- Učitavanje zadataka preko Search rute (Backend filtriranje) ---
-  // const fetchTasks = (page = 1) => {
-  //   // Ako imamo list_id, vučemo iz te liste, inače koristimo search rutu za sve
-  //   let url = listId 
-  //     ? `/task-lists/${listId}?page=${page}` 
-  //     : `/tasks/search?page=${page}`;
-
-  //   // Dodajemo filtere samo ako nije "all" i ako nismo unutar specifične liste 
-  //   // (Možeš dodati filtere i za listId ako backend to podržava)
-  //   if (!listId) {
-  //     if (status !== "all") url += `&status=${status}`;
-  //     if (priority !== "all") url += `&priority=${priority}`;
-  //   }
-
-  //   api.get(url)
-  //     .then((res) => {
-  //       // Laravel Resource vraća podatke u res.data.data
-  //       let incomingData = listId ? res.data.data.tasks : res.data.data;
-        
-  //       // Sigurnosna provera za niz
-  //       setTasks(Array.isArray(incomingData) ? incomingData : []);
-
-  //       // Ažuriranje paginacije iz meta podataka (Laravel pagination)
-  //       if (res.data.meta) {
-  //         setCurrentPage(res.data.meta.current_page);
-  //         setLastPage(res.data.meta.last_page);
-  //       }
-  //     })
-  //     .catch((err) => console.error("Error loading data:", err));
-  // };
-
-
   const fetchTasks = (page = 1) => {
   let url = listId
-    ? `/task-lists/${listId}`
+    ? `/task-lists/${listId}/tasks`
     : `/tasks/search`;
 
   if (!listId) {
