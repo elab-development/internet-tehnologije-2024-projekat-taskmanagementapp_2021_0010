@@ -10,14 +10,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // Registracija
     public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-                                        //ora biti jedinstveno u koloni email tabele users.
             'email' => 'required|string|email|unique:users,email',
-            //confirm-To znači da frontend mora poslati dva polja: password i password_confirmation
             'password' => 'required|string|confirmed',
              'phone' => 'nullable|string|max:20',
         ]);
@@ -31,7 +28,6 @@ class AuthController extends Controller
 
         ]);
 
-        //Ova linija koristi Laravel Sanctum za kreiranje novog API tokena za novokreiranog korisnika.
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'user' => $user,
@@ -45,8 +41,7 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-//first() izvršava query i vraća samo prvi rezultat iz baze pre toga je samo sablon za upit
-// ne treba get() jer bi on vraćao kolekciju svih korisnika 
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -70,9 +65,8 @@ class AuthController extends Controller
     ]);
     }
 
-    // Logout
     public function logout(Request $request)
-    { //Briše token iz baze a na frontu iz storaga brises
+    { 
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([

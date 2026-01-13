@@ -54,7 +54,6 @@ export default function Tasks() {
 
   // --- Kreiranje ili ažuriranje zadatka ---
  const handleCreateOrUpdate = (data) => {
-  //  Provera da li je korisnik prijavljen
   const token = localStorage.getItem("token");
   if (!token) {
     alert("You must be logged-in for this actions");
@@ -91,7 +90,6 @@ const req = editTask
       setEditTask(null);
     })
     .catch((err) => {
-      // Ako je token nevažeći ili istekla sesija
       if (err.response?.status === 401) {
         alert("You must be logged in!");
         localStorage.removeItem("token");
@@ -253,7 +251,7 @@ const handleExport = async () => {
 
 
       {/* Paginacija */}
-      {!listId && (
+      
         <div className="pagination">
           <button
             disabled={currentPage === 1}
@@ -279,7 +277,7 @@ const handleExport = async () => {
             →
           </button>
         </div>
-      )}
+      
 
       {/* Modal za kreiranje/izmenu zadatka */}
       {showModal && (
@@ -327,7 +325,7 @@ const handleExport = async () => {
   })),
 },
 
-            {
+    {
   name: "task_list_id",
   label: "List",
   type: "select",

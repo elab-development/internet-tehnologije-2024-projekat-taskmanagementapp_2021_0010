@@ -17,7 +17,6 @@ class TaskListFactory extends Factory
     {
 
     return [
-     //  'user_id' => \App\Models\User::factory(), ne treba u samom seederu to regulisano
         'name' => $this->faker->sentence(3),
         'description' => $this->faker->sentence(),
         'is_favorite' => $this->faker->boolean(),

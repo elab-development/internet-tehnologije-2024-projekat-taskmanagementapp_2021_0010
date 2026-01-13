@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
 
   const fetchUsers = (page = 1) => {
-    api.get(`/users?page=${page}&per_page=5`)
+    api.get(`/users?page=${page}`)
       .then((res) => {
         setUsers(res.data.data);
         setCurrentPage(res.data.meta.current_page);
@@ -48,12 +48,10 @@ export default function AdminDashboard() {
   return (
     <div className="tasks-page" style={{ maxWidth: '1100px', margin: '0 auto' }}>
 <style>{`
-  /* 1. Sklanjanje breadcrumbs-a */
   .breadcrumbs, .breadcrumbs-container { 
     display: none !important; 
   }
 
-  /* 2. Kartica: Vraćamo je u normalu, samo dodajemo unutrašnji razmak */
   .item-card {
     padding: 20px !important;
     margin-bottom: 15px !important;
@@ -62,7 +60,6 @@ export default function AdminDashboard() {
     justify-content: flex-start !important;
   }
 
-  /* 3. Header: Ime i Email ostaju u istom redu (horizontalno) */
   .item-header {
     display: flex !important;
     flex-direction: row !important; /* Vraća email pored imena */
@@ -77,7 +74,6 @@ export default function AdminDashboard() {
     font-size: 1.2rem !important;
   }
 
-  /* 4. KLJUČNI DEO: Razmak do dugmića */
   .item-actions {
     margin-top: 25px !important; /* Ovde kontrolišeš razmak između teksta i dugmića */
     display: flex !important;
@@ -86,7 +82,6 @@ export default function AdminDashboard() {
     padding-top: 15px !important;
   }
 
-  /* 5. Admin Panel Header */
   .admin-header-line {
     border-bottom: 1px solid rgba(255, 143, 163, 0.2);
     margin-bottom: 30px;

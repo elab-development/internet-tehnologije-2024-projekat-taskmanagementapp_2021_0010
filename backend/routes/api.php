@@ -31,8 +31,8 @@ Route::prefix('v1')->group(function () {
         Route::get('tasks/priority/{priority}', [TaskController::class, 'filterByPriority']);
         
         Route::get('tasks/category/{id}', [TaskController::class, 'filterByCategory']);
-      //  Route::get('users/{id}/task-lists', [TaskListController=class, 'getByUser']);
         Route::get('task-lists/{id}/tasks', [TaskController::class, 'getByTaskList']);
+        Route::get('task-categories/{id}/tasks', [TaskController::class, 'getByCategory']);
         Route::get('/dashboard-stats', [DashboardController::class, 'stats']);
         Route::get('/tasks-in-progress', [DashboardController::class, 'tasksInProgress']);
         Route::get('/holidays-tasks', [DashboardController::class, 'holidaysAndTasks']);

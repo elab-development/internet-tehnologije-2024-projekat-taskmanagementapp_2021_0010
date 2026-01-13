@@ -17,7 +17,6 @@ class TaskCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //this trenutni objekat klase taskcatfact
         'name' => $this->faker->unique()->word(),
         ];
     }

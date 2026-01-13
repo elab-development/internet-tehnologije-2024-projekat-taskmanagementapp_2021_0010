@@ -13,9 +13,7 @@ return new class extends Migration
     {
     Schema::create('tasks', function (Blueprint $table) {
     $table->id();
-     //Ako se obriše korisnik → obriši automatski sve njegove liste. a constraind za povezivanje fk
     $table->foreignId('task_list_id')->constrained()->onDelete('cascade');
-    //Ako se obriše kategorija → postavi category_id na NULL za sve taskove koji su je koristili.
     $table->foreignId('category_id')->nullable()->constrained('task_categories')->onDelete('set null');
     $table->string('title');
     $table->text('description')->nullable();

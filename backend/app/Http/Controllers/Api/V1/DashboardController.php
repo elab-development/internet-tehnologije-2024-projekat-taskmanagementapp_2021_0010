@@ -19,7 +19,6 @@ public function stats()
 {
     $userId = Auth::id();
 
-    // Motivacioni citat
     try {
         $response = Http::timeout(5)->get('https://zenquotes.io/api/random');
         $quoteData = $response->json()[0];
@@ -27,7 +26,6 @@ public function stats()
         $quoteData = ['q' => 'Stay motivated!', 'a' => 'System'];
     }
 
-    // Taskovi po kategorijama (JOIN + groupBy)
     $tasksByCategory = DB::table('tasks')
         ->join('task_lists', 'tasks.task_list_id', '=', 'task_lists.id')
         ->join('task_categories', 'tasks.category_id', '=', 'task_categories.id')
@@ -38,7 +36,6 @@ public function stats()
         ->groupBy('task_categories.name')
         ->get();
 
-    // Taskovi po statusu
     $tasksByStatus = DB::table('tasks')
         ->join('task_lists', 'tasks.task_list_id', '=', 'task_lists.id')
         ->where('task_lists.user_id', $userId)
@@ -49,7 +46,6 @@ public function stats()
         ->groupBy('status')
         ->get();
 
-    // Taskovi po prioritetu
     $tasksByPriority = DB::table('tasks')
         ->join('task_lists', 'tasks.task_list_id', '=', 'task_lists.id')
         ->where('task_lists.user_id', $userId)
@@ -76,9 +72,6 @@ public function stats()
 }
 
 
-    /**
-     * Tasks in progress for the logged-in user
-     */
 public function tasksInProgress()
 {
     $userId = Auth::id();
@@ -98,23 +91,17 @@ public function holidaysAndTasks()
 {
     $userId = Auth::id();
 
-    // 1. Poziv javnog REST servisa ,HTTP GET zahtev ka javnom REST servisu koji vraća praznike za Srbiju 2025.
     try {
         $response = Http::timeout(5)->get('https://date.nager.at/api/v3/PublicHolidays/2026/RS');
-        $holidays = $response->json(); // JSON niz praznika
+        $holidays = $response->json(); 
     } catch (\Exception $e) {
         $holidays = [];
     }
 
-    // 2. Dohvati zadatke koji imaju deadline na praznik
     $tasksOnHolidays = Task::whereHas('taskList', fn($q) => $q->where('user_id', $userId))
-    //Uzmi samo taskove čiji je deadline JEDAN OD datuma praznika
-    //collect($holidays) → pretvara niz u Laravel kolekciju
-    //toArray() → pretvara u običan PHP niz
         ->whereIn('deadline', collect($holidays)->pluck('date')->toArray())
         ->get(['title', 'deadline', 'priority']);
 
-    // 3. Vrati JSON sa složenom logikom
     return response()->json([
         'holidays' => $holidays,
         'tasks_due_on_holidays' => $tasksOnHolidays

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
     //HandleCors ti je koristan ako frontend i backend rade na različitim domenima/portovima.
            \Illuminate\Http\Middleware\HandleCors::class,
+           //Ona omogućava Laravelu da prepozna tvoj React frontend i dozvoli mu da se "prijavi" koristeći kolačiće ili tokene.
            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
 
@@ -27,5 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Ako zahtev dolazi sa frontenda ili je API zahtev, uvek vrati JSON
+    $exceptions->shouldRenderJsonWhen(function ($request, $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+            return $request->expectsJson();
+        }); 
     })->create();

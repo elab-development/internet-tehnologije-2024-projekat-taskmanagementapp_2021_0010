@@ -30,9 +30,7 @@ class TaskListController extends Controller
             'is_favorite' => 'boolean'
         ]);
 
-        //// Laravel sam uzima ID ulogovanog korisnika i kreira listu kroz relaciju
         $validated['user_id'] = $user->id; 
-
         $list = TaskList::create($validated);
 
         return new TaskListResource($list);
@@ -70,7 +68,6 @@ class TaskListController extends Controller
         ]);
 
         $list->update($validated);
-
         return new TaskListResource($list);
       
     }
@@ -79,11 +76,9 @@ class TaskListController extends Controller
     {
         $user = Auth::user();
         $list = TaskList::where('user_id', $user->id)->find($id);
-
         if (!$list) {
             return response()->json(['error' => 'Task list not found'], 404);
         }
-
         $list->delete();
 
         return response()->json(['message' => 'Task list deleted']);
