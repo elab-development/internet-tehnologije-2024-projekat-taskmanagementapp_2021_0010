@@ -15,7 +15,7 @@ class TaskSeeder extends Seeder
      */
     public function run(): void
     {
-         $lists = TaskList::all();
+        $lists = TaskList::all();
         $categories = TaskCategory::all();
 
         foreach ($lists as $list) {

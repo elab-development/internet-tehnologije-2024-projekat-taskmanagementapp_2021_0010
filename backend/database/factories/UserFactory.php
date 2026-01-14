@@ -14,8 +14,6 @@ class UserFactory extends Factory
     /**
      * The current password being used by the factory.
      */
-    protected static ?string $password;
-
     /**
      * Define the model's default state.
      *
@@ -27,19 +25,11 @@ class UserFactory extends Factory
         'name' => $this->faker->name(),
         'email' => $this->faker->unique()->safeEmail(),
         'phone' => $this->faker->phoneNumber(),
-        'password' => bcrypt('password'),
+        'password' => 'password',
         'role' => $this->faker->randomElement(['admin', 'user', 'guest']),
     ];
         
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
-    }
+  
 }

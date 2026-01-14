@@ -9,9 +9,14 @@ class TaskCategory extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskCategoryFactory> */
     use HasFactory;
+      protected $fillable = [
+        'name',
+        'description',
+    ];
     public function tasks()
 {
-    return $this->hasMany(Task::class, 'category_id');
+    return $this->hasMany(Task::class);
+                                    
 }
 
 }

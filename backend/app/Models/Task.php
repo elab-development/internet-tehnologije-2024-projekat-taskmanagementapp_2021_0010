@@ -9,6 +9,18 @@ class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
+    
+    protected $fillable = [
+        'task_list_id',
+        'category_id',
+        'title',
+        'description',
+        'priority',
+        'status',
+        'deadline',
+        'estimated_hours'
+    ];
+ 
     public function taskList()
 {
     return $this->belongsTo(TaskList::class);
@@ -16,7 +28,8 @@ class Task extends Model
 
 public function category()
 {
-    return $this->belongsTo(TaskCategory::class, 'category_id');
+    return $this->belongsTo(TaskCategory::class);
+                                              
 }
 
 }

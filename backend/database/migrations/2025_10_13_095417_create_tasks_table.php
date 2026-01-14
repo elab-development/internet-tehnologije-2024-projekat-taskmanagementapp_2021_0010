@@ -17,8 +17,8 @@ return new class extends Migration
     $table->foreignId('category_id')->nullable()->constrained('task_categories')->onDelete('set null');
     $table->string('title');
     $table->text('description')->nullable();
-    $table->enum('priority', ['nizak', 'srednji', 'visok'])->default('srednji');
-    $table->enum('status', ['započet', 'u toku', 'završen'])->default('započet');
+    $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
+    $table->enum('status', ['started', 'in progress', 'finished'])->default('started');
     $table->date('deadline')->nullable();
     $table->timestamps();
         });
